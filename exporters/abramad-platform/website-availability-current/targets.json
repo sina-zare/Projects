@@ -1,0 +1,32 @@
+[
+  {
+    "host": "Abramad-Website",
+    "group": "Internal_Services",
+    "ds_uid": "ffmenurs6lts0a",
+    "chunk": 3
+  },
+  {
+    "host": "Abramad-CloudWebsite",
+    "group": "Cloud_Internal_Services",
+    "ds_uid": "ffmenurs6lts0a",
+    "chunk": 3
+  },
+  {
+    "host": "AbramadCloud-Shahkar",
+    "group": "Cloud_Internal_Services",
+    "ds_uid": "dfmenqykyvrpcf",
+    "chunk": 3
+  },
+  {
+    "host": "AbramadCloud-ECS01",
+    "group": "Cloud_Internal_Services",
+    "ds_uid": "ffmenurs6lts0a",
+    "chunk": 3
+  },
+  {
+    "host": "AbramadCloud-ECS02",
+    "group": "Cloud_Internal_Services",
+    "ds_uid": "ffmenurs6lts0a",
+    "chunk": 3
+  }
+]

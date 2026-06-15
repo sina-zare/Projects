@@ -1,0 +1,10 @@
+services:
+  dellemc-unity-exporter:
+    image: dellemc-unity-exporter:latest
+    build: .
+    container_name: dellemc-unity-exporter
+    ports:
+      - "9105:9105"
+    env_file:
+      - .env
+    restart: unless-stopped

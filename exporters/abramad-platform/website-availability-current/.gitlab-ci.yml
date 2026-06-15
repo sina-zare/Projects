@@ -1,0 +1,35 @@
+stages:
+  - build
+
+variables:
+
+  APP_NAME: "website-availability-current-exporter"
+  MAIN_VER: "1"
+  NEXUS_DOCKER_REGISTRY: "vnk-nexus.abramad.com:5000"    
+  
+before_script:
+
+  - COMMIT_HASH=$(echo "${CI_COMMIT_SHA}" | cut -c1-7)
+  - BUILD_NUMBER=$(git rev-list --count HEAD)
+  - VERSION="${MAIN_VER}.${BUILD_NUMBER}_${COMMIT_HASH}"
+  - IMAGE_NAME="${APP_NAME}:${VERSION}"
+  - IMAGE_FULL="${NEXUS_DOCKER_REGISTRY}/${IMAGE_NAME}"
+  - echo "Generated version ${IMAGE_NAME}"
+
+  - echo "$NEXUS_PASS" | docker login $NEXUS_DOCKER_REGISTRY -u "$NEXUS_USER" --password-stdin
+
+build_and_push:
+  image: vnk-nexus.abramad.com/library/docker:26
+  stage: build
+  tags:
+    - docker
+
+  rules:
+    - changes:
+        - Dockerfile
+        - website_availability_current_exporter.py
+        - requirements.txt
+
+  script:
+    - docker build -t $IMAGE_FULL .
+    - docker push $IMAGE_FULL

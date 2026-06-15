@@ -1,0 +1,10 @@
+services:
+  dellemc-unity-exporter:
+    image: vnk-nexus.abramad.com:5000/dellemc-unity-exporter:1.0
+    build: .
+    container_name: dellemc-unity-exporter
+    ports:
+      - "9105:9105"
+    env_file:
+      - .env
+    restart: unless-stopped

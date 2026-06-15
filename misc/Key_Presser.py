@@ -1,0 +1,17 @@
+import time
+from pynput.keyboard import Controller, KeyCode
+
+# Create a keyboard controller
+keyboard = Controller()
+
+try:
+    while True:
+        # Press the number '0'
+        keyboard.press(KeyCode(char='0'))  # Using KeyCode for '0'
+        keyboard.release(KeyCode(char='0'))
+
+        # Wait for 60 seconds before the next press
+        time.sleep(60)
+except KeyboardInterrupt:
+    print("Script terminated by user.")
+#000000

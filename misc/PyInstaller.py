@@ -1,0 +1,1 @@
+pyinstaller --onefile --icon=sa.ico --hidden-import=ldap3  SA_Authenticator.py

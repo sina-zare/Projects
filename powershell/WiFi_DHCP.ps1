@@ -1,0 +1,1 @@
+﻿Get-NetAdapter -Name Wi-Fi | Set-NetIPInterface -DHCP Enabled

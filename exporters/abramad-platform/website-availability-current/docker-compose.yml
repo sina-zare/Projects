@@ -1,0 +1,14 @@
+services:
+  website-availability-exporter:
+    image: website-availability-current-exporter:1.0
+
+    ports:
+      - "9779:9779"
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./targets.json:/config/targets.json:ro
+
+    restart: unless-stopped

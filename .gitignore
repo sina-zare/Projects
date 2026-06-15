@@ -1,0 +1,8 @@
+abramad-gitlab/
+.idea/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+no-git/

@@ -1,0 +1,4 @@
+numpy
+prometheus_client
+requests
+gunicorn
