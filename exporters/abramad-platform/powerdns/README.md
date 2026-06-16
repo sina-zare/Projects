@@ -103,9 +103,9 @@ All variables are required unless a default is noted.
 | `READ_STATUS_PROMQL` | PromQL metric name for read status history | `pdns_read_current_status` |
 | `WRITE_STATUS_PROMQL` | PromQL metric name for write status history | `pdns_write_current_status` |
 | `READ_STATUS_COLLECTION_INTERVAL` | How often (in minutes) to test DNS name resolution | `1` |
-| `READ_AVAILABILITY_COLLECTION_INTERVAL` | How often (in minutes) to compute read availability; also the Grafana lookback window | `1440` (24h) |
+| `READ_AVAILABILITY_COLLECTION_INTERVAL` | How often (in minutes) to compute read availability | `1440` (24h) |
 | `WRITE_STATUS_COLLECTION_INTERVAL` | How often (in minutes) to test A record creation/deletion | `15` |
-| `WRITE_AVAILABILITY_COLLECTION_INTERVAL` | How often (in minutes) to compute write availability; also the Grafana lookback window | `1440` (24h) |
+| `WRITE_AVAILABILITY_COLLECTION_INTERVAL` | How often (in minutes) to compute write availability | `1440` (24h) |
 
 ---
 
@@ -197,7 +197,7 @@ groups:
             Last Error:           {{ $labels.last_error }}
 ```
 
-> **Note on sample thresholds:** The `PowerDNSAvailabilityFewSamplesCollected` alert expects `primary` to have at least 96 samples (one per `WRITE_STATUS_COLLECTION_INTERVAL=15m` over 24h) and `secondary` to have at least 1440 (one per `READ_STATUS_COLLECTION_INTERVAL=1m` over 24h). Adjust these thresholds if you change the collection intervals.
+> **Note on sample thresholds:** The PowerDNSAvailabilityFewSamplesCollected alert threshold is 1440 because the availability collectors always query the previous calendar day (00:00–23:59) at 1-minute resolution, which produces exactly 1440 data points under normal conditions.
 
 ---
 
