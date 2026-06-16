@@ -1,0 +1,266 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 1525c35a49b84643b78e505d135a1967
+      name: 'Windows Servers'
+  templates:
+    - uuid: 44634d9f2c7f4fcab38c2e1bf05cf6b9
+      template: 'Windows Top 5 Service Utilization'
+      name: 'Windows Top 5 Service Utilization'
+      groups:
+        - name: 'Windows Servers'
+      items:
+        - uuid: faec883eecb84778bb266bbe57a7227f
+          name: services.top5cpu
+          type: ZABBIX_ACTIVE
+          key: services.top5cpu
+          history: 7d
+          value_type: TEXT
+          trends: '0'
+          tags:
+            - tag: target
+              value: services
+        - uuid: d198acf842e0478080086ac8ebfa8fca
+          name: services.top5ram
+          type: ZABBIX_ACTIVE
+          key: services.top5ram
+          history: 7d
+          value_type: TEXT
+          trends: '0'
+          tags:
+            - tag: target
+              value: services
+      discovery_rules:
+        - uuid: 34084c20500240e69c9149f888acbbd4
+          name: 'Top5 services CPU discovery'
+          type: DEPENDENT
+          key: services.top5cpu.discovery
+          delay: '0'
+          lifetime_type: DELETE_IMMEDIATELY
+          lifetime: '0'
+          item_prototypes:
+            - uuid: 7f4bd7a2ee304d88a57c635cf2c76af4
+              name: 'CPU % usage of {#PROCNAME}'
+              type: DEPENDENT
+              key: 'service.cpu[{#PROCNAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              trends: 90d
+              units: '%'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Dynamic-key robust extractor — CPU prototype
+                      var metric = 'CPU';
+                      
+                      try { var obj = JSON.parse(value); } catch (e) { return null; }
+                      var arr = obj.data;
+                      if (!Array.isArray(arr)) return null;
+                      
+                      // macro raw text
+                      var rawPid = '{#PID}';
+                      var rawName = '{#PROCNAME}';
+                      var pidSub = !(typeof rawPid === 'string' && rawPid.indexOf('{#') === 0);
+                      var nameSub = !(typeof rawName === 'string' && rawName.indexOf('{#') === 0);
+                      var targetPid = pidSub ? String(rawPid) : null;
+                      var targetName = nameSub ? String(rawName) : null;
+                      
+                      function findKeyByHints(o, hints) {
+                        var keys = Object.keys(o || {});
+                        hints = hints.map(function(h){ return h.toLowerCase(); });
+                        for (var i=0;i<keys.length;i++) {
+                          var k = keys[i];
+                          var kl = k.toLowerCase();
+                          for (var j=0;j<hints.length;j++) {
+                            if (kl.indexOf(hints[j]) !== -1) return k;
+                          }
+                        }
+                        return null;
+                      }
+                      
+                      // Precompute keys for each element and try to match
+                      for (var i=0;i<arr.length;i++){
+                        var it = arr[i];
+                        // find key names that contain 'pid' or '#pid'
+                        var pidKey = findKeyByHints(it, ['#pid','pid']);
+                        var nameKey = findKeyByHints(it, ['procname','proc','service','svcname','name']);
+                        // normalize values
+                        var pidVal = pidKey ? String(it[pidKey]) : null;
+                        var nameVal = nameKey ? String(it[nameKey]) : null;
+                      
+                        if (targetPid && pidVal && pidVal === targetPid) {
+                          var v = it[metric]; return (v === undefined || v === null) ? null : String(v);
+                        }
+                        if (targetName && nameVal && nameVal === targetName) {
+                          var v2 = it[metric]; return (v2 === undefined || v2 === null) ? null : String(v2);
+                        }
+                      }
+                      
+                      // fallback: if macros not substituted (Test UI) and only one element present, return that element
+                      if (!pidSub && !nameSub && arr.length === 1) {
+                        var v3 = arr[0][metric]; return (v3 === undefined || v3 === null) ? null : String(v3);
+                      }
+                      
+                      return null;
+              master_item:
+                key: services.top5cpu
+              tags:
+                - tag: target
+                  value: services
+          master_item:
+            key: services.top5cpu
+        - uuid: a360724e46b045f887783684be6cb7b4
+          name: 'Top5 services Memory discovery'
+          type: DEPENDENT
+          key: services.top5memory.discovery
+          delay: '0'
+          lifetime_type: DELETE_IMMEDIATELY
+          lifetime: '0'
+          item_prototypes:
+            - uuid: da3f77e9b5414de0962e0b410c5616fc
+              name: 'MemoryMB usage of {#PROCNAME}'
+              type: DEPENDENT
+              key: 'service.memmb[{#PROCNAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              trends: 90d
+              units: MB
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Dynamic-key robust extractor — MemoryMB prototype
+                      var metric = 'MemoryMB';
+                      
+                      try { var obj = JSON.parse(value); } catch (e) { return null; }
+                      var arr = obj.data;
+                      if (!Array.isArray(arr)) return null;
+                      
+                      // macro raw text
+                      var rawPid = '{#PID}';
+                      var rawName = '{#PROCNAME}';
+                      var pidSub = !(typeof rawPid === 'string' && rawPid.indexOf('{#') === 0);
+                      var nameSub = !(typeof rawName === 'string' && rawName.indexOf('{#') === 0);
+                      var targetPid = pidSub ? String(rawPid) : null;
+                      var targetName = nameSub ? String(rawName) : null;
+                      
+                      function findKeyByHints(o, hints) {
+                        var keys = Object.keys(o || {});
+                        hints = hints.map(function(h){ return h.toLowerCase(); });
+                        for (var i=0;i<keys.length;i++) {
+                          var k = keys[i];
+                          var kl = k.toLowerCase();
+                          for (var j=0;j<hints.length;j++) {
+                            if (kl.indexOf(hints[j]) !== -1) return k;
+                          }
+                        }
+                        return null;
+                      }
+                      
+                      // Precompute keys for each element and try to match
+                      for (var i=0;i<arr.length;i++){
+                        var it = arr[i];
+                        // find key names that contain 'pid' or '#pid'
+                        var pidKey = findKeyByHints(it, ['#pid','pid']);
+                        var nameKey = findKeyByHints(it, ['procname','proc','service','svcname','name']);
+                        // normalize values
+                        var pidVal = pidKey ? String(it[pidKey]) : null;
+                        var nameVal = nameKey ? String(it[nameKey]) : null;
+                      
+                        if (targetPid && pidVal && pidVal === targetPid) {
+                          var v = it[metric]; return (v === undefined || v === null) ? null : String(v);
+                        }
+                        if (targetName && nameVal && nameVal === targetName) {
+                          var v2 = it[metric]; return (v2 === undefined || v2 === null) ? null : String(v2);
+                        }
+                      }
+                      
+                      // fallback: if macros not substituted (Test UI) and only one element present, return that element
+                      if (!pidSub && !nameSub && arr.length === 1) {
+                        var v3 = arr[0][metric]; return (v3 === undefined || v3 === null) ? null : String(v3);
+                      }
+                      
+                      return null;
+              master_item:
+                key: services.top5ram
+              tags:
+                - tag: target
+                  value: services
+            - uuid: 108768fbf95046a58d737845a2f0b64f
+              name: 'Memory % usage of {#PROCNAME}'
+              type: DEPENDENT
+              key: 'service.mempct[{#PROCNAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              trends: 90d
+              units: '%'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      // Dynamic-key robust extractor — MemoryPercent prototype
+                      var metric = 'MemoryPercent';
+                      
+                      try { var obj = JSON.parse(value); } catch (e) { return null; }
+                      var arr = obj.data;
+                      if (!Array.isArray(arr)) return null;
+                      
+                      // macro raw text
+                      var rawPid = '{#PID}';
+                      var rawName = '{#PROCNAME}';
+                      var pidSub = !(typeof rawPid === 'string' && rawPid.indexOf('{#') === 0);
+                      var nameSub = !(typeof rawName === 'string' && rawName.indexOf('{#') === 0);
+                      var targetPid = pidSub ? String(rawPid) : null;
+                      var targetName = nameSub ? String(rawName) : null;
+                      
+                      function findKeyByHints(o, hints) {
+                        var keys = Object.keys(o || {});
+                        hints = hints.map(function(h){ return h.toLowerCase(); });
+                        for (var i=0;i<keys.length;i++) {
+                          var k = keys[i];
+                          var kl = k.toLowerCase();
+                          for (var j=0;j<hints.length;j++) {
+                            if (kl.indexOf(hints[j]) !== -1) return k;
+                          }
+                        }
+                        return null;
+                      }
+                      
+                      // Precompute keys for each element and try to match
+                      for (var i=0;i<arr.length;i++){
+                        var it = arr[i];
+                        // find key names that contain 'pid' or '#pid'
+                        var pidKey = findKeyByHints(it, ['#pid','pid']);
+                        var nameKey = findKeyByHints(it, ['procname','proc','service','svcname','name']);
+                        // normalize values
+                        var pidVal = pidKey ? String(it[pidKey]) : null;
+                        var nameVal = nameKey ? String(it[nameKey]) : null;
+                      
+                        if (targetPid && pidVal && pidVal === targetPid) {
+                          var v = it[metric]; return (v === undefined || v === null) ? null : String(v);
+                        }
+                        if (targetName && nameVal && nameVal === targetName) {
+                          var v2 = it[metric]; return (v2 === undefined || v2 === null) ? null : String(v2);
+                        }
+                      }
+                      
+                      // fallback: if macros not substituted (Test UI) and only one element present, return that element
+                      if (!pidSub && !nameSub && arr.length === 1) {
+                        var v3 = arr[0][metric]; return (v3 === undefined || v3 === null) ? null : String(v3);
+                      }
+                      
+                      return null;
+              master_item:
+                key: services.top5ram
+              tags:
+                - tag: target
+                  value: services
+          master_item:
+            key: services.top5ram
+      tags:
+        - tag: Author
+          value: SysOps_Team
