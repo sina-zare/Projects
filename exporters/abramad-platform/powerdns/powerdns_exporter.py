@@ -101,7 +101,7 @@ pdns_24h_availability_samples_up = Gauge(
 exporter_last_collection_success = Gauge(
     "pdns_exporter_last_collection_success",
     "1 if last collection succeeded",
-    ["role", "mode", "collection_interval", "last_error"],
+    ["role", "mode", "collection_interval"],
     registry=registry
 )
 
@@ -170,10 +170,39 @@ def retry(
             delay *= backoff_factor
 
 
-def query_grafana(datastore_uid, promql, last_minutes=0):
+def get_previous_day_window():
+    day = datetime.now().date() - timedelta(days=1)
 
-    time_from = int((datetime.now() - timedelta(minutes=last_minutes)).timestamp() * 1000)  # in ms
-    time_to = int(datetime.now().timestamp() * 1000)
+    start = datetime.combine(day, datetime.min.time())
+    end = start + timedelta(days=1)
+
+    return start, end
+
+
+def query_grafana(
+    datastore_uid,
+    promql,
+    last_minutes=0,
+    use_previous_day=False
+):
+    if use_previous_day:
+        start, end = get_previous_day_window()
+
+        time_from = int(start.timestamp() * 1000)
+        time_to = int(end.timestamp() * 1000)
+
+        # For full-day queries, maxDataPoints should reflect ~1 day of 1m resolution
+        max_data_points = 1440
+
+    else:
+        now = datetime.now()
+
+        time_from = int(
+            (now - timedelta(minutes=last_minutes)).timestamp() * 1000
+        )
+        time_to = int(now.timestamp() * 1000)
+
+        max_data_points = last_minutes if last_minutes else 1440
 
     payload = {
         "queries": [
@@ -187,7 +216,7 @@ def query_grafana(datastore_uid, promql, last_minutes=0):
                 "instant": False,
                 "range": True,
                 "intervalMs": 60000,
-                "maxDataPoints": last_minutes,
+                "maxDataPoints": max_data_points,
                 "step": "60s"
             }
         ],
@@ -207,14 +236,13 @@ def query_grafana(datastore_uid, promql, last_minutes=0):
             json=payload,
             timeout=30
         )
-        # retry only on server-side issues
+
         if r.status_code >= 500:
             raise requests.exceptions.HTTPError(
                 f"Grafana returned {r.status_code}"
             )
 
         r.raise_for_status()
-
         return r.json()
 
     return retry(_request)
@@ -352,12 +380,11 @@ def collector_loop(collect_func, interval, role, mode):
             exporter_last_collection_success.labels(
                 role=role,
                 mode=mode,
-                collection_interval=f"{str(interval)}m",
-                last_error='N/A'
+                collection_interval=f"{str(interval)}m"
             ).set(1)
 
         except Exception as e:
-            logger.error(f"Collection failed: {e}\n")
+            logger.error(f"collection failed: {e}\n")
 
 
             if role == 'secondary':
@@ -402,12 +429,11 @@ def collector_loop(collect_func, interval, role, mode):
                     else:
                         collector_error = e
 
-
+            logger.error(f"error detail: {collector_error}\n")
             exporter_last_collection_success.labels(
                 role=role,
                 mode=mode,
-                collection_interval=f"{str(interval)}m",
-                last_error=collector_error
+                collection_interval=f"{str(interval)}m"
             ).set(0)
 
             exporter_collection_errors_total.labels(
@@ -521,12 +547,15 @@ def collect_read_availability():
     global avail_read_error
 
     logger.info(f">>> collect_read_availability() starting")
-    today_date = datetime.now().strftime("%Y/%m/%d")
+    report_day = datetime.now().date() - timedelta(days=1)
+
+    report_day_str = report_day.strftime("%Y/%m/%d")
+
     data = retry(
             lambda: query_grafana(
                 datastore_uid=GRAFANA_PROM_DS,
                 promql=READ_STATUS_PROMQL,
-                last_minutes=READ_AVAILABILITY_COLLECTION_INTERVAL
+                use_previous_day=True
             ),
             max_attempts=5
         )
@@ -542,7 +571,7 @@ def collect_read_availability():
         pdns_24h_availability_percent.labels(
             role="secondary",
             func="read",
-            date=today_date
+            date=report_day_str
         ).set(-1)
 
         raise RuntimeError(avail_read_error)
@@ -553,31 +582,30 @@ def collect_read_availability():
         pdns_24h_availability_percent.labels(
             role="secondary",
             func="read",
-            date=today_date
+            date=report_day_str
         ).set(-1)
 
         raise RuntimeError(avail_read_error)
 
     metrics = values[1]
 
-    if len(metrics) < READ_AVAILABILITY_COLLECTION_INTERVAL:
-        avail_read_error = f"expected {READ_AVAILABILITY_COLLECTION_INTERVAL} samples, got {len(metrics)}"
-
-        pdns_24h_availability_percent.labels(
-            role="secondary",
-            func="read",
-            date=today_date
-        ).set(-1)
-
-        raise RuntimeError(avail_read_error)
-
     original_up = sum(metrics)
     original_total = len(metrics)
     original_availability = round((original_up / original_total) * 100, 4)
 
+    if original_total == 0:
+        avail_read_error = f"no data in yesterday time window"
+
+        pdns_24h_availability_percent.labels(
+            role="primary",
+            func="write",
+            date=report_day_str
+        ).set(-1)
+
+        raise RuntimeError(avail_write_error)
 
     logger.info(
-        "Read Availability | total samples=%s up samples=%s availability=%s",
+        "read availability | total samples=%s up samples=%s availability=%s",
         original_total,
         original_up,
         original_availability
@@ -586,19 +614,19 @@ def collect_read_availability():
     pdns_24h_availability_percent.labels(
         role="secondary",
         func="read",
-        date=today_date
+        date=report_day_str
     ).set(original_availability)
 
     pdns_24h_availability_samples_up.labels(
         role="secondary",
         func="read",
-        date=today_date
+        date=report_day_str
     ).set(original_up)
 
     pdns_24h_availability_samples_total.labels(
         role="secondary",
         func="read",
-        date=today_date
+        date=report_day_str
     ).set(original_total)
 
 
@@ -684,12 +712,14 @@ def collect_write_availability():
     global avail_write_error
 
     logger.info(f">>> collect_write_availability() starting")
-    today_date = datetime.now().strftime("%Y/%m/%d")
+    report_day = datetime.now().date() - timedelta(days=1)
+
+    report_day_str = report_day.strftime("%Y/%m/%d")
     data = retry(
             lambda: query_grafana(
                 datastore_uid=GRAFANA_PROM_DS,
                 promql=WRITE_STATUS_PROMQL,
-                last_minutes=WRITE_AVAILABILITY_COLLECTION_INTERVAL
+                use_previous_day=True
             ),
             max_attempts=5
         )
@@ -705,7 +735,7 @@ def collect_write_availability():
         pdns_24h_availability_percent.labels(
             role="primary",
             func="write",
-            date=today_date
+            date=report_day_str
         ).set(-1)
 
         raise RuntimeError(avail_write_error)
@@ -716,30 +746,30 @@ def collect_write_availability():
         pdns_24h_availability_percent.labels(
             role="primary",
             func="write",
-            date=today_date
+            date=report_day_str
         ).set(-1)
 
         raise RuntimeError(avail_write_error)
 
     metrics = values[1]
 
-    if len(metrics) < WRITE_AVAILABILITY_COLLECTION_INTERVAL:
-        avail_write_error = f"expected {WRITE_AVAILABILITY_COLLECTION_INTERVAL} samples, got {len(metrics)}"
-
-        pdns_24h_availability_percent.labels(
-            role="primary",
-            func="write",
-            date=today_date
-        ).set(-1)
-
-        raise RuntimeError(avail_write_error)
-
     original_up = sum(metrics)
     original_total = len(metrics)
     original_availability = round((original_up / original_total) * 100, 4)
 
+    if original_total == 0:
+        avail_write_error = f"no data in yesterday time window"
+
+        pdns_24h_availability_percent.labels(
+            role="primary",
+            func="write",
+            date=report_day_str
+        ).set(-1)
+
+        raise RuntimeError(avail_write_error)
+
     logger.info(
-        "Write Availability | total samples=%s up samples=%s availability=%s",
+        "write availability | total samples=%s up samples=%s availability=%s",
         original_total,
         original_up,
         original_availability
@@ -748,19 +778,19 @@ def collect_write_availability():
     pdns_24h_availability_percent.labels(
         role="primary",
         func="write",
-        date=today_date
+        date=report_day_str
     ).set(original_availability)
 
     pdns_24h_availability_samples_up.labels(
         role="primary",
         func="write",
-        date=today_date
+        date=report_day_str
     ).set(original_up)
 
     pdns_24h_availability_samples_total.labels(
         role="primary",
         func="write",
-        date=today_date
+        date=report_day_str
     ).set(original_total)
 
 
