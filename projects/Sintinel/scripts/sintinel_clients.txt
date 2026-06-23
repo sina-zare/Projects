@@ -1,0 +1,6 @@
+# Format Help
+# PSQL --> Hostname:SSH_User:Host_IP:SSH_Port:Restic_User:Restic_Password:Repo_Password:Backup_Type:Postgres_Port:Postgres_User
+# Example  my-db:my-user:192.0.2.10:22:restic-user:RESTIC_USER_PASSWORD:REPO_PASSWORD:psql:5432:postgres
+
+# DIR  --> Hostname:SSH_User:Host_IP:SSH_Port:Restic_User:Restic_Password:Repo_Password:Backup_Type:Backup_Dir
+# Example  my-fileserver:my-user:192.0.2.11:22:restic-user:RESTIC_USER_PASSWORD:REPO_PASSWORD:dir:/var/www
