@@ -311,14 +311,12 @@ try:
     vab_key_map = {
         301: "vm_creation_date",
         311: "vm_shutdown_date",
-        767676: "vm_disconnect_date", # Update key
         620: "vm_company_name",
         302: "vm_public_ip",
         402: "vm_creation_ticket_no",
         501: "vm_shutdown_ticket_no",
-        7676767: "vm_disconnect_ticket_no", # Update key
+        614: "vm_disconnect_ticket_no",
         306: "vm_national_no",
-        101: "vm_tafsil_no",
         102: "vm_backup_status",
         303: "vm_url",
         304: "vm_ipsids_status",
@@ -327,49 +325,41 @@ try:
         308: "vm_owner",
         309: "vm_dongle_status",
         312: "vm_site_to_site_status",
-        313: "vm_usage",
         314: "vm_vip_status",
         315: "vm_waf_status",
-        316: "vm_zabbix_vip_status",
         602: "vm_rep_name",
         603: "vm_rep_no",
         604: "vm_rep_email",
-        608: "vm_confidentiality_weight",
-        609: "vm_integrity_weight",
-        610: "vm_availability_weight",
         611: "vm_product_line",
+        615: "vm_native_backup_status",
+        612: "vm_sepidar_lock_no",
     }
 
     me_key_map = {
         104: "vm_creation_date",
         401: "vm_shutdown_date",
-        767676: "vm_disconnect_date", # Update key
         1202: "vm_company_name",
         603: "vm_public_ip",
         1405: "vm_creation_ticket_no",
         1406: "vm_shutdown_ticket_no",
         1206: "vm_disconnect_ticket_no",
         611: "vm_national_no",
-        1201: "vm_tafsil_no",
         102: "vm_backup_status",
         604: "vm_url",
         703: "vm_ipsids_status",
+        902: "vm_not_monitored_status",
         903: "vm_in_dept_status",
-        76767676: "vm_not_monitored_status", # Update key
         1001: "vm_owner",
         701: "vm_dongle_status",
         702: "vm_site_to_site_status",
-        1002: "vm_usage",
         705: "vm_vip_status",
         704: "vm_waf_status",
-        7676767676: "vm_zabbix_vip_status", # Update key
         1203: "vm_rep_name",
         1204: "vm_rep_no",
         1205: "vm_rep_email",
-        1301: "vm_confidentiality_weight",
-        1302: "vm_integrity_weight",
-        1303: "vm_availability_weight",
         1304: "vm_product_line",
+        1403: "vm_native_backup_status",
+        1305: "vm_sepidar_lock_no",
     }
 
     # Ignore the warning/# Create an SSL context with no certificate verification

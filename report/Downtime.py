@@ -344,7 +344,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -370,7 +370,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -395,7 +395,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -420,7 +420,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -445,7 +445,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -476,7 +476,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -507,7 +507,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -541,7 +541,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -572,7 +572,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])
@@ -603,7 +603,7 @@ try:
                     vm_persian_name = ""
                     custom_value_n = vm.summary.customValue
                     for i in custom_value_n:
-                        if i.key == 103:
+                        if i.key == 1202:
                             vm_persian_name = i.value
 
                     writer.writerow([vm.name, f"\t{str(vm_national_id)}", vm_persian_name])

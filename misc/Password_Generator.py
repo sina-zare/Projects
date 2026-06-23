@@ -8,5 +8,5 @@ def generate_password(length):
 
 
 # Generate a password
-password = generate_password(16)
+password = generate_password(30)
 print("Generated Password:", password)
