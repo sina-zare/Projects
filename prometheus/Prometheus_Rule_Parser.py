@@ -401,9 +401,9 @@ try:
                                 if team not in team_alerts:
                                     team_alerts[team] = {}
                                 if datacenter not in team_alerts[team]:
-                                    team_alerts[team][datacenter] = {}
+                                    team_alerts[team][datacenter] = []
 
-                                team_alerts[team][datacenter][alert] = {
+                                team_alerts[team][datacenter].append( {
                                     "alert": alert,
                                     "expr": expr,
                                     "severity": severity,
@@ -411,7 +411,7 @@ try:
                                     "team": team,
                                     "group": group_name,
                                     "file": file
-                                }
+                                })
 
     confluence = Confluence(
         url='https://confluence.abramad.com',
@@ -468,10 +468,10 @@ try:
         header = ["Datacenter", "Alert", "Team", "Severity", "Type", "Group", "File", "Expression"]
         worksheet.append(header)
 
-        for datacenter_name, alert in datacenter.items():
+        for datacenter_name, alert_list  in datacenter.items():
             print(f"\t{datacenter_name}")
-            for alert_name, alert_data in alert.items():
-                print(f"\t\t{alert_name}")
+            for alert_data in alert_list:
+                print(f"\t\t{alert_data['alert']}")
                 for key, value in alert_data.items():
                     print(f"\t\t\t{key}: {value}")
 
@@ -574,5 +574,5 @@ finally:
         registry=registry
     )
 
-    print('✅ Metrics Sent.')
+    print('Metrics Sent.')
 
