@@ -5,5 +5,5 @@ venv/
 __pycache__/
 *.pyc
 *.log
-no-git/
+nogit/
 *.tar

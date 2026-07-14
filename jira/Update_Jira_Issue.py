@@ -36,7 +36,7 @@ jira = JIRA(options=options, basic_auth=(jira_username, jira_password))
 
 
 
-for i in range(16000,17410):
+for i in range(3276,17500):
     # Issue key to be updated
     issue_key = f'SERVICDESK-{str(i)}'
 
