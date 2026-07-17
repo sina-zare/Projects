@@ -20,4 +20,4 @@ def check_battery(threshold=20, check_interval=30):
 
         time.sleep(check_interval)
 
-check_battery()
+check_battery(20, 15)
