@@ -19,7 +19,7 @@ The template uses the vendor's private enterprise MIB (`1.3.6.1.4.1.1229`, SEH C
 
 ## Template Group
 
-`Templates/Network devices`
+`Templates/Network Appliances`
 
 ## Setup
 

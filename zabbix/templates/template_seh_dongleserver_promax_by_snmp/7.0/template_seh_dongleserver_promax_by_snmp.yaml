@@ -1,15 +1,15 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    - uuid: 36bff6c29af64692839d077febfc7079
-      name: 'Templates/Network devices'
+    - uuid: 4a7239d825044287bba8ed8288975b70
+      name: Templates/Network_Appliances
   templates:
     - uuid: 4b67e347f1f441d1b6a8ae7a73e14acf
       template: 'SEH Dongle Server ProMAX by SNMP'
       name: 'SEH Dongle Server ProMAX by SNMP'
       description: 'Monitors SEH Dongle Server Promax by SNMP'
       groups:
-        - name: 'Templates/Network devices'
+        - name: Templates/Network_Appliances
       items:
         - uuid: 85459a56742d45e4899ce86a1444d82c
           name: 'ICMP ping'
