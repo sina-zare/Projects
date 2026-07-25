@@ -32,7 +32,7 @@ import pyzipper
 script_name = 'downtime_vnk'
 total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
 total_failed_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-failed-execs.txt'
-pushgateway_url = 'http://me-prometheus.abramad.com:9091'
+pushgateway_url = 'https://vnk-prometheus.abramad.com:9091'
 job_name = 'python_scripts'
 instance = script_name
 datacenter = 'vanak'
@@ -387,7 +387,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -397,7 +397,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Rahkaran VR1 VMs gathered in {vr1_total_vms_path}')
 
@@ -417,7 +417,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -427,7 +427,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Rahkaran VR2 VMs gathered in {vr2_total_vms_path}')
 
@@ -447,7 +447,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -457,7 +457,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Rahkaran VR3 VMs gathered in {vr3_total_vms_path}')
 
@@ -477,7 +477,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -487,7 +487,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Rahkaran VRD VMs gathered in {vrd_total_vms_path}')
 
@@ -611,7 +611,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -621,7 +621,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Sepidar VMs gathered in {vsp_total_vms_path}')
 
@@ -641,7 +641,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -651,7 +651,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'BI VMs gathered in {vbi_total_vms_path}')
 
@@ -671,7 +671,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -681,7 +681,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Automation VMs gathered in {vat_total_vms_path}')
 
@@ -701,7 +701,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -711,7 +711,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Managed IaaS VMs gathered in {vmi_total_vms_path}')
 
@@ -731,7 +731,7 @@ try:
                             vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                             vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                             vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                            vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                            vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
                         """)
 
                         vm_rep_no_raw = vm_attrs.get('vm_rep_no', 'N/A')
@@ -741,7 +741,7 @@ try:
                                          vm_attrs.get('vm_company_name', 'N/A'),
                                          vm_attrs.get('vm_rep_name', 'N/A'),
                                          vm_rep_no,
-                                         vm_attrs.get('vm_rep_mail', 'N/A')])
+                                         vm_attrs.get('vm_rep_email', 'N/A')])
 
             print(f'Saham Fasl VMs gathered in {vsf_total_vms_path}')
 
@@ -753,7 +753,7 @@ try:
                 vm_company_name: {vm_attrs.get('vm_company_name', 'N/A')}
                 vm_rep_name: {vm_attrs.get('vm_rep_name', 'N/A')}
                 vm_rep_no: {vm_attrs.get('vm_rep_no', 'N/A')}
-                vm_rep_mail: {vm_attrs.get('vm_rep_mail', 'N/A')}
+                vm_rep_email: {vm_attrs.get('vm_rep_email', 'N/A')}
             """)
 
             success = False
@@ -1477,4 +1477,4 @@ finally:
     )
 
 
-    print('✅ Metrics Sent.')
+    print('Metrics Sent.')
