@@ -27,7 +27,7 @@ build_and_push:
   rules:
     - changes:
         - Dockerfile
-        - powerdns_exporter.py
+        - cisco_nxos_vpc_exporter.py
         - requirements.txt
 
   script:

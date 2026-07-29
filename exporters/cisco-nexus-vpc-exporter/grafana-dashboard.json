@@ -1,0 +1,1693 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "#05285d",
+              "mode": "fixed"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "pill"
+              },
+              "filterable": true,
+              "footer": {
+                "reducers": []
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Switch Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 237
+                },
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Neighbor"
+              },
+              "properties": [
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 118
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Type2 Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 164
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Per VLAN Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 187
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Type1 Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 160
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Link State"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 169
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Link Reason"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 184
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Last *"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "0": {
+                          "index": 1,
+                          "text": "🔴"
+                        },
+                        "1": {
+                          "index": 0,
+                          "text": "🟢"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VRF Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 104
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Role"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 136
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "📊"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 50
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 20,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "cellHeight": "sm",
+          "enablePagination": false,
+          "showHeader": true
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_link_health",
+            "instant": true,
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "VPC Peer Link Health",
+        "transformations": [
+          {
+            "id": "reduce",
+            "options": {
+              "labelsToFields": true,
+              "reducers": [
+                "lastNotNull"
+              ]
+            }
+          },
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "name",
+                  "neighbor",
+                  "per_vlan_peer_consistency",
+                  "reason",
+                  "role",
+                  "state",
+                  "type1_consistency",
+                  "type2_consistency",
+                  "vrf",
+                  "Last *"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "name": 0,
+                "neighbor": 1,
+                "per_vlan_peer_consistency": 4,
+                "reason": 8,
+                "role": 3,
+                "state": 7,
+                "type1_consistency": 5,
+                "type2_consistency": 6,
+                "vrf": 2
+              },
+              "renameByName": {
+                "Last *": "📊",
+                "name": "Switch Name",
+                "neighbor": "Neighbor",
+                "per_vlan_peer_consistency": "Per VLAN Consistency",
+                "reason": "VPC Peer Link Reason",
+                "role": "Role",
+                "state": "VPC Peer Link State",
+                "type1_consistency": "Type1 Consistency",
+                "type2_consistency": "Type2 Consistency",
+                "vrf": "VRF Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "#363636",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "dtdhms"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 4,
+          "x": 20,
+          "y": 0
+        },
+        "id": 3,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "value_and_name",
+          "wideLayout": true
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "expr": "nxos_vpc_uptime{name='$switch_name'}",
+            "instant": false,
+            "legendFormat": "Uptime",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "color": "yellow",
+                    "index": 1
+                  },
+                  "1": {
+                    "color": "#05285d",
+                    "index": 0
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "light-blue",
+                  "value": 0
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Uptime: "
+              },
+              "properties": []
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 4,
+          "x": 20,
+          "y": 3
+        },
+        "id": 2,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "horizontal",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "name",
+          "wideLayout": true
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_link_health{name='$switch_name'}",
+            "instant": true,
+            "legendFormat": "Domain ID: {{domain_id}}",
+            "range": false,
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_link_health{name='$switch_name'}",
+            "instant": true,
+            "legendFormat": "VRF: {{vrf}}",
+            "range": false,
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_keepalive_health{name='$switch_name'}",
+            "instant": true,
+            "legendFormat": "Peer Keepalive: {{state}}",
+            "range": false,
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_link_health{name='$switch_name'}",
+            "instant": true,
+            "legendFormat": "Peer Link: {{state}} - {{reason}}",
+            "range": false,
+            "refId": "C"
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "#05285d",
+              "mode": "fixed"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "pill"
+              },
+              "filterable": true,
+              "footer": {
+                "reducers": []
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Switch Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 237
+                },
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Neighbor"
+              },
+              "properties": [
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 118
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Type2 Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 164
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Keepalive State"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 189
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Type1 Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 160
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Link State"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 169
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Link Reason"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 184
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Last *"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "0": {
+                          "index": 1,
+                          "text": "🔴"
+                        },
+                        "1": {
+                          "index": 0,
+                          "text": "🟢"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VRF Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 104
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Role"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 136
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "📊"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 50
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VPC Peer Keepalive State"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 207
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 11,
+          "x": 0,
+          "y": 11
+        },
+        "id": 4,
+        "options": {
+          "cellHeight": "sm",
+          "enablePagination": false,
+          "showHeader": true
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_peer_keepalive_health",
+            "instant": true,
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "VPC Peer Keepalive Health",
+        "transformations": [
+          {
+            "id": "reduce",
+            "options": {
+              "labelsToFields": true,
+              "reducers": [
+                "lastNotNull"
+              ]
+            }
+          },
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "name",
+                  "neighbor",
+                  "per_vlan_peer_consistency",
+                  "reason",
+                  "role",
+                  "state",
+                  "type1_consistency",
+                  "type2_consistency",
+                  "vrf",
+                  "Last *"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "name": 0,
+                "neighbor": 1,
+                "per_vlan_peer_consistency": 4,
+                "reason": 8,
+                "role": 3,
+                "state": 7,
+                "type1_consistency": 5,
+                "type2_consistency": 6,
+                "vrf": 2
+              },
+              "renameByName": {
+                "Last *": "📊",
+                "name": "Switch Name",
+                "neighbor": "Neighbor",
+                "per_vlan_peer_consistency": "Per VLAN Consistency",
+                "reason": "VPC Peer Link Reason",
+                "role": "Role",
+                "state": "VPC Peer Keepalive State",
+                "type1_consistency": "Type1 Consistency",
+                "type2_consistency": "Type2 Consistency",
+                "vrf": "VRF Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "#05285d",
+              "mode": "fixed"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "pill"
+              },
+              "filterable": true,
+              "footer": {
+                "reducers": []
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "OK - No Inconsistency Found",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Switch Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 226
+                },
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Neighbor"
+              },
+              "properties": [
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 113
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "type"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 184
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Last *"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "0": {
+                          "index": 1,
+                          "text": "🔴"
+                        },
+                        "1": {
+                          "index": 0,
+                          "text": "🟢"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "VRF Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 104
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Role"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 136
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "State"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 242
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Value"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 107
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Type"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 131
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 13,
+          "x": 11,
+          "y": 11
+        },
+        "id": 5,
+        "options": {
+          "cellHeight": "sm",
+          "enablePagination": false,
+          "showHeader": true,
+          "sortBy": [
+            {
+              "desc": true,
+              "displayName": "Value"
+            }
+          ]
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_consistency_status{name='$switch_name'} == 0",
+            "instant": true,
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "VPC Consistency Status",
+        "transformations": [
+          {
+            "id": "reduce",
+            "options": {
+              "labelsToFields": true,
+              "reducers": [
+                "lastNotNull"
+              ]
+            }
+          },
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "name",
+                  "neighbor",
+                  "role",
+                  "state",
+                  "type",
+                  "value"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "name": 0,
+                "neighbor": 1,
+                "role": 3,
+                "state": 5,
+                "type": 4,
+                "value": 6,
+                "vrf": 2
+              },
+              "renameByName": {
+                "Last *": "📊",
+                "name": "Switch Name",
+                "neighbor": "Neighbor",
+                "per_vlan_peer_consistency": "Per VLAN Consistency",
+                "reason": "VPC Peer Link Reason",
+                "role": "Role",
+                "state": "State",
+                "type": "Type",
+                "type1_consistency": "Type1 Consistency",
+                "type2_consistency": "Type2 Consistency",
+                "value": "Value",
+                "vrf": "VRF Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "#05285d",
+              "mode": "fixed"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "pill"
+              },
+              "filterable": true,
+              "footer": {
+                "reducers": []
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "OK - No Unhealthy PortChannel",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Switch Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 226
+                },
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Neighbor"
+              },
+              "properties": [
+                {
+                  "id": "custom.cellOptions",
+                  "value": {
+                    "type": "auto"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 113
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Consistency"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "thresholds"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 117
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Last *"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "0": {
+                          "index": 1,
+                          "text": "🔴"
+                        },
+                        "1": {
+                          "index": 0,
+                          "text": "🟢"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Role"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 136
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "State"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 220
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Value"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "palette-classic-by-name"
+                  }
+                },
+                {
+                  "id": "custom.width",
+                  "value": 107
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "PortChannel"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 117
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Thru Peerlink"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 123
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 12,
+          "x": 0,
+          "y": 22
+        },
+        "id": 6,
+        "options": {
+          "cellHeight": "sm",
+          "enablePagination": false,
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_portchannel_health{name='$switch_name'} == 0",
+            "instant": true,
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "VPC PortChannel Health",
+        "transformations": [
+          {
+            "id": "reduce",
+            "options": {
+              "labelsToFields": true,
+              "reducers": [
+                "lastNotNull"
+              ]
+            }
+          },
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "consistency",
+                  "name",
+                  "neighbor",
+                  "portchannel",
+                  "state",
+                  "thru_peerlink"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "consistency": 4,
+                "name": 0,
+                "neighbor": 1,
+                "portchannel": 2,
+                "state": 3,
+                "thru_peerlink": 5
+              },
+              "renameByName": {
+                "Last *": "📊",
+                "consistency": "Consistency",
+                "name": "Switch Name",
+                "neighbor": "Neighbor",
+                "per_vlan_peer_consistency": "Per VLAN Consistency",
+                "portchannel": "PortChannel",
+                "reason": "VPC Peer Link Reason",
+                "role": "Role",
+                "state": "State",
+                "thru_peerlink": "Thru Peerlink",
+                "type": "Type",
+                "type1_consistency": "Type1 Consistency",
+                "type2_consistency": "Type2 Consistency",
+                "value": "Value",
+                "vrf": "VRF Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-cividis"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "index": 1,
+                    "text": "DOWN"
+                  },
+                  "1": {
+                    "index": 0,
+                    "text": "UP"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 5,
+          "x": 13,
+          "y": 22
+        },
+        "id": 7,
+        "options": {
+          "displayMode": "lcd",
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "maxVizHeight": 300,
+          "minVizHeight": 16,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "auto",
+          "valueMode": "text"
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_scrape_up",
+            "instant": true,
+            "legendFormat": "{{name}}",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "NXOS VPC Exporter Target Status",
+        "transformations": [
+          {
+            "id": "renameByRegex",
+            "options": {
+              "regex": "(.*).abramad.com",
+              "renamePattern": "$1"
+            }
+          }
+        ],
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "aftu92pch94hse"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-cividis"
+            },
+            "decimals": 0,
+            "fieldMinMax": false,
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "index": 1,
+                    "text": "DOWN"
+                  },
+                  "1": {
+                    "index": 0,
+                    "text": "UP"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "s"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 5,
+          "x": 19,
+          "y": 22
+        },
+        "id": 8,
+        "options": {
+          "displayMode": "lcd",
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "maxVizHeight": 300,
+          "minVizHeight": 16,
+          "minVizWidth": 8,
+          "namePlacement": "auto",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showUnfilled": true,
+          "sizing": "auto",
+          "valueMode": "text"
+        },
+        "pluginVersion": "12.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "aftu92pch94hse"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "nxos_vpc_scrape_duration_seconds",
+            "instant": true,
+            "legendFormat": "{{name}}",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "NXOS VPC Exporter Target Query Duration ",
+        "transformations": [
+          {
+            "id": "renameByRegex",
+            "options": {
+              "regex": "(.*).abramad.com",
+              "renamePattern": "$1"
+            }
+          }
+        ],
+        "type": "bargauge"
+      }
+    ],
+    "preload": false,
+    "schemaVersion": 42,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "allowCustomValue": false,
+          "current": {
+            "text": "VTS-Leaf-C7U24.abramad.com",
+            "value": "VTS-Leaf-C7U24.abramad.com"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "aftu92pch94hse"
+          },
+          "definition": "label_values(nxos_vpc_peer_link_health,name)",
+          "label": "Switch Name",
+          "name": "switch_name",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values(nxos_vpc_peer_link_health,name)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "regexApplyTo": "value",
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "NXOS VPC",
+    "uid": "siphdvf",
+    "version": 22,
+    "weekStart": ""
+  }

@@ -25,4 +25,4 @@ USER exporter
 EXPOSE 9922
 
 # Run gunicorn using env variables
-CMD ["sh", "-c", "gunicorn -w 1 --threads 2 --timeout 15 -b 0.0.0.0:9922  cisco_nxos_vpc_exporter:app"]
+CMD ["sh", "-c", "gunicorn -w 1 --threads 8 --timeout 60 -b 0.0.0.0:9922  cisco_nxos_vpc_exporter:app"]

@@ -1,0 +1,219 @@
+groups:
+- name: nxos_vpc_alerts
+  rules:
+
+  ## --- Exporter / scrape health --- ##
+  - alert: NxosVpcExporterDown
+    expr: up{job="cisco-nxos-vpc-exporter"} != 1
+    for: 5m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "Nexus VPC exporter unreachable for {{ $labels.instance }}"
+      description: |
+        Prometheus cannot scrape the exporter's /metrics endpoint at all
+        (container down, network path to the exporter broken, etc.)
+
+        Instance:     {{ $labels.instance }}
+        Job:          {{ $labels.job }}
+
+  - alert: NxosVpcDeviceScrapeFailed
+    expr: nxos_vpc_scrape_up != 1
+    for: 5m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC metric collection failed for switch {{ $labels.name }}"
+      description: |
+        The exporter's HTTP endpoint responded, but the SSH scrape of this
+        specific switch failed (unreachable, auth failure, command error).
+
+        Switch:       {{ $labels.name }}
+        Value:        {{ $value }}
+
+  - alert: NxosVpcScrapeSlow
+    expr: nxos_vpc_scrape_duration_seconds > 20
+    for: 10m
+    labels:
+      severity: warning
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC scrape for {{ $labels.name }} is unusually slow"
+      description: |
+        Scrape duration has been above 20s for 10m
+        
+        Switch:       {{ $labels.name }}
+        Duration (s): {{ $value }}
+
+
+  ## --- Peer link / keepalive --- ##
+  - alert: NxosVpcPeerLinkDegraded
+    expr: nxos_vpc_peer_link_health == 0
+    for: 2m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC peer link degraded on {{ $labels.name }}"
+      description: |
+        The VPC peer link is not in a healthy state. Risks of dual-active
+        (split-brain) forwarding if the keepalive path also fails.
+
+        Switch:            {{ $labels.name }}
+        Neighbor:          {{ $labels.neighbor }}
+        Role:              {{ $labels.role }}
+        VRF:               {{ $labels.vrf }}
+        State:             {{ $labels.state }}
+        Reason:            {{ $labels.reason }}
+
+        Consistency Type1: {{ $labels.type1_consistency }}
+        Consistency Type2: {{ $labels.type2_consistency }}
+        Consistency vlan:  {{ $labels.per_vlan_peer_consistency }}
+
+  - alert: NxosVpcPeerKeepaliveDown
+    expr: nxos_vpc_peer_keepalive_health == 0
+    for: 2m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC peer keepalive down on {{ $labels.name }}"
+      description: |
+        The keepalive link between VPC peers is down. On its own this
+        doesn't break forwarding, but it removes the mechanism that
+        prevents dual-active if the peer link fails too - treat as urgent
+        if NxosVpcPeerLinkDegraded is also firing for this switch.
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        VRF:          {{ $labels.vrf }}
+        State:        {{ $labels.state }}
+
+  - alert: NxosVpcPeerLinkRecentlyFlapped
+    expr: nxos_vpc_uptime < 600
+    for: 0m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC on {{ $labels.name }} came up recently"
+      description: |
+        VPC uptime is under 10 minutes, meaning the peer link/keepalive
+        session (re)established recently 
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        Uptime (s):   {{ $value }}
+
+  ## --- Consistency checks --- ##
+  - alert: NxosVpcType1ConsistencyFailed
+    expr: nxos_vpc_consistency_status{type="type1"} == 0
+    for: 5m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC type-1 consistency failure on {{ $labels.name }}"
+      description: |
+        Type-1 (global) consistency check is failing. This blocks VPC
+        from coming up, or suspends secondary VPCs - global config
+        (VLANs, STP mode, etc.) likely mismatched between peers.
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        Role:         {{ $labels.role }}
+        State:        {{ $labels.state }}
+        Value:        {{ $labels.value }}
+
+  - alert: NxosVpcType2ConsistencyFailed
+    expr: nxos_vpc_consistency_status{type="type2"} == 0
+    for: 10m
+    labels:
+      severity: warning
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC type-2 consistency failure on {{ $labels.name }}"
+      description: |
+        Type-2 consistency check is failing. VPC stays operational but
+        some functionality (e.g. QoS/ACL alignment) may be limited between
+        peers until resolved.
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        Role:         {{ $labels.role }}
+        State:        {{ $labels.state }}
+        Value:        {{ $labels.value }}
+
+  - alert: NxosVpcVlanConsistencyFailed
+    expr: nxos_vpc_consistency_status{type="vlan"} == 0
+    for: 10m
+    labels:
+      severity: warning
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC per-VLAN consistency failure on {{ $labels.name }}"
+      description: |
+        Per-VLAN peer consistency is inconsistent between VPC peers -
+        check for VLAN allowed-list or STP mismatches.
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        Role:         {{ $labels.role }}
+        State:        {{ $labels.state }}
+        Value:        {{ $labels.value }}
+
+  - alert: NxosVpcPortchannelConsistencyFailed
+    expr: nxos_vpc_consistency_status{type=~"Portchannel_.*"} == 0
+    for: 5m
+    labels:
+      severity: warning
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC port-channel consistency failure on {{ $labels.name }} ({{ $labels.type }})"
+      description: |
+        Consistency check failed for this specific port-channel - member
+        configuration likely mismatched between the two VPC peers.
+
+        Switch:       {{ $labels.name }}
+        Neighbor:     {{ $labels.neighbor }}
+        Role:         {{ $labels.role }}
+        State:        {{ $labels.state }}
+        Value:        {{ $labels.value }}
+
+  ## --- Port-channel health --- ##
+  - alert: NxosVpcPortchannelDegraded
+    expr: nxos_vpc_portchannel_health == 0
+    for: 2m
+    labels:
+      severity: critical
+      channel: sms
+      team: network
+      type: prod
+    annotations:
+      summary: "VPC port-channel {{ $labels.portchannel }} degraded on {{ $labels.name }}"
+      description: |
+        This VPC port-channel is not healthy
+        
+        Switch:         {{ $labels.name }}
+        Portchannel:    {{ $labels.portchannel }}
+        Consistency:    {{ $labels.consistency }}
+        State:          {{ $labels.state }}
+        Thru peerlink:  {{ $labels.thru_peerlink }}

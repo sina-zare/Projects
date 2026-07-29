@@ -146,7 +146,14 @@ def _safe_lower(value):
     return value.lower() if isinstance(value, str) else ""
 
 
-# ---------------- Persistent connection pool ----------------
+def _rows_as_list(table, row_key):
+    """NX-OS `| json` quirk: ROW_x is a dict (not a list) when there's
+    exactly one row. Normalize to a list either way."""
+    rows = table.get(row_key, [])
+    if isinstance(rows, dict):
+        return [rows]
+    return rows or []
+
 
 def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
     raw_data = json.loads(vpc_output)
@@ -197,37 +204,37 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
         match = re.search(r"\((\d+)\)\s+seconds", vpc_keepalive_uptime)
         vpc_uptime_seconds = int(match.group(1)) if match else None
 
-    vpc_vrf_name = keepalive_data.get("vpc-keepalive-vrf")
-    vpc_neighbor = keepalive_data.get("vpc-keepalive-dest")
-    vpc_peer_keepalive_status = raw_data.get("vpc-peer-keepalive-status")
+    vpc_vrf_name = _safe_lower(keepalive_data.get("vpc-keepalive-vrf"))
+    vpc_neighbor = _safe_lower(keepalive_data.get("vpc-keepalive-dest"))
+    vpc_peer_keepalive_status = _safe_lower(raw_data.get("vpc-peer-keepalive-status"))
 
     vpc_domain_id = raw_data.get("vpc-domain-id")
-    vpc_role = raw_data.get("vpc-role")
-    vpc_peer_status = raw_data.get("vpc-peer-status")
-    vpc_peer_status_reason = raw_data.get("vpc-peer-status-reason")
-    vpc_peer_consistency = raw_data.get("vpc-peer-consistency")
-    vpc_type2_consistency_status = raw_data.get("vpc-type-2-consistency")
-    vpc_type2_consistency_reason = raw_data.get("vpc-type-2-consistency-status")
-    vpc_per_vlan_peer_consistency = raw_data.get("vpc-per-vlan-peer-consistency")
-    vpc_peer_consistency_status = raw_data.get("vpc-peer-consistency-status")
-
-    vpcs = {}
-    for row in raw_data.get("TABLE_vpc").get("ROW_vpc"):
-        vpcs[row["vpc-ifindex"]] = {
-            "state": row.get("vpc-port-state", None),
-            "consistency": row.get("vpc-consistency", None),
-            "consistency_status": row.get("vpc-consistency-status", None),
-            "thru_peerlink": row.get("vpc-thru-peerlink", None),
-        }
+    vpc_role = _safe_lower(raw_data.get("vpc-role"))
+    vpc_peer_status = _safe_lower(raw_data.get("vpc-peer-status"))
+    vpc_peer_status_reason = _safe_lower(raw_data.get("vpc-peer-status-reason"))
+    vpc_peer_consistency = _safe_lower(raw_data.get("vpc-peer-consistency"))
+    vpc_type2_consistency_status = _safe_lower(raw_data.get("vpc-type-2-consistency"))
+    vpc_type2_consistency_reason = _safe_lower(raw_data.get("vpc-type-2-consistency-status"))
+    vpc_per_vlan_peer_consistency = _safe_lower(raw_data.get("vpc-per-vlan-peer-consistency"))
+    vpc_peer_consistency_status = _safe_lower(raw_data.get("vpc-peer-consistency-status"))
 
     # vpcs = {}
-    # for row in _rows_as_list(raw_data.get("TABLE_vpc", {}), "ROW_vpc"):
-    #     vpcs[row.get("vpc-ifindex")] = {
-    #         "state": row.get("vpc-port-state"),
-    #         "consistency": row.get("vpc-consistency"),
-    #         "consistency_status": row.get("vpc-consistency-status"),
-    #         "thru_peerlink": row.get("vpc-thru-peerlink"),
+    # for row in raw_data.get("TABLE_vpc").get("ROW_vpc"):
+    #     vpcs[row["vpc-ifindex"]] = {
+    #         "state": row.get("vpc-port-state", None),
+    #         "consistency": row.get("vpc-consistency", None),
+    #         "consistency_status": row.get("vpc-consistency-status", None),
+    #         "thru_peerlink": row.get("vpc-thru-peerlink", None),
     #     }
+
+    vpcs = {}
+    for row in _rows_as_list(raw_data.get("TABLE_vpc", {}), "ROW_vpc"):
+        vpcs[row.get("vpc-ifindex")] = {
+            "state": row.get("vpc-port-state"),
+            "consistency": _safe_lower(row.get("vpc-consistency")),
+            "consistency_status": _safe_lower(row.get("vpc-consistency-status")),
+            "thru_peerlink": row.get("vpc-thru-peerlink"),
+        }
 
 
     # Metrics filling
@@ -243,19 +250,18 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
         type1_consistency=vpc_peer_consistency,
         per_vlan_peer_consistency=vpc_per_vlan_peer_consistency,
         type2_consistency=vpc_type2_consistency_status
-    ).set(1 if _safe_lower(vpc_peer_status) == "peer-ok" else 0)
+    ).set(1 if vpc_peer_status == "peer-ok" else 0)
 
 
     # keepalive health
     nxos_vpc_peer_keepalive_health.labels(
         name=switch_name,
         neighbor=vpc_neighbor,
-        reason=vpc_peer_status_reason,
         domain_id=vpc_domain_id,
         role=vpc_role,
         vrf=vpc_vrf_name,
         state=vpc_peer_keepalive_status,
-    ).set(1 if _safe_lower(vpc_peer_keepalive_status) == "peer-alive" else 0)
+    ).set(1 if vpc_peer_keepalive_status == "peer-alive" else 0)
 
 
     # uptime
@@ -277,7 +283,7 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
         type="type1",
         state=vpc_peer_consistency_status,
         value=vpc_peer_consistency,
-    ).set(1 if _safe_lower(vpc_peer_consistency) == "consistent" else 0)
+    ).set(1 if vpc_peer_consistency == "consistent" else 0)
 
     #type 2
     nxos_vpc_consistency_status.labels(
@@ -288,7 +294,7 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
         type="type2",
         state=vpc_type2_consistency_reason,
         value=vpc_type2_consistency_status,
-    ).set(1 if _safe_lower(vpc_type2_consistency_status) == "consistent" else 0)
+    ).set(1 if vpc_type2_consistency_status == "consistent" else 0)
 
     #type vlan
     nxos_vpc_consistency_status.labels(
@@ -299,7 +305,7 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
         type="vlan",
         state="null",
         value=vpc_per_vlan_peer_consistency,
-    ).set(1 if _safe_lower(vpc_per_vlan_peer_consistency) == "consistent" else 0)
+    ).set(1 if vpc_per_vlan_peer_consistency == "consistent" else 0)
 
 
     #type portchannel consistency and portchannel health
@@ -312,7 +318,7 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
             type=f"Portchannel_{vpc_index}",
             state=vpc.get("consistency_status"),
             value=vpc.get("consistency"),
-        ).set(1 if _safe_lower(vpc.get("consistency")) == "consistent" else 0)
+        ).set(1 if vpc.get("consistency") == "consistent" else 0)
 
         state = vpc.get("state")
         nxos_vpc_portchannel_health.labels(
@@ -327,7 +333,9 @@ def collect_vpc_metrics(switch_name, vpc_output, keepalive_output, registry):
 
     log.debug(json.dumps({
         "switch_name": switch_name,
+        "vpc_uptime_seconds": vpc_uptime_seconds,
         "vpc_domain_id": vpc_domain_id,
+        "vpc_vrf_name": vpc_vrf_name,
         "vpc_neighbor": vpc_neighbor,
         "vpc_role": vpc_role,
         "vpc_peer_status": vpc_peer_status,
@@ -431,4 +439,4 @@ def app(environ, start_response):
     start_response("200 OK", [("Content-Type", CONTENT_TYPE_LATEST)])
     return [output]
 
-# gunicorn -w 1 --threads 8 --timeout 30 -b 0.0.0.0:9922 cisco_nxos_vpc_exporter:app
+# gunicorn -w 1 --threads 8 --timeout 60 -b 0.0.0.0:9922 cisco_nxos_vpc_exporter:app
