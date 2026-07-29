@@ -1,0 +1,11 @@
+services:
+  cisco-nxos-vpc-exporter:
+    image: vnk-nexus.abramad.com:5000/cisco-nxos-vpc-exporter:1.2_79eceb92
+
+    ports:
+      - "9922:9922"
+
+    env_file:
+      - .env
+
+    restart: unless-stopped
