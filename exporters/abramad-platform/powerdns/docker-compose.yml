@@ -1,0 +1,11 @@
+services:
+  powerdns-exporter:
+    image: sinazare/powerdns-exporter:1.0
+
+    ports:
+      - "5335:5335"
+
+    env_file:
+      - .env
+
+    restart: unless-stopped
