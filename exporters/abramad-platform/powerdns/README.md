@@ -255,3 +255,7 @@ DNS resolution and Grafana queries use an exponential-backoff retry helper:
 ## Concurrency
 
 A single `threading.Lock` (`collection_lock`) serialises all collector writes and the `/metrics` scrape read, preventing partial metric state from being exposed during a collection cycle.
+
+## License
+
+This project is licensed under the MIT License.
