@@ -1,6 +1,6 @@
 services:
   cisco-nxos-vpc-exporter:
-    image: vnk-nexus.abramad.com:5000/cisco-nxos-vpc-exporter:1.xyz
+    image: sinazare/cisco-nxos-vpc-exporter:1.xyz
 
     ports:
       - "9922:9922"
