@@ -179,3 +179,8 @@ Alertmanager routing to match your notification setup.
 - Because SSH sessions persist across scrapes, killing/restarting the
   exporter container will force fresh SSH logins to every switch on the
   next scrape after restart.
+
+
+## License
+
+This project is licensed under the MIT License.
