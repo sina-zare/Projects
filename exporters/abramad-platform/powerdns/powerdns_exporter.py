@@ -62,14 +62,14 @@ for var in (PDNS_ADDR, PDNS_TOKEN, PDNS_WRITE_RECORD, PDNS_QUERY_RECORD, GRAFANA
 pdns_read_current_status = Gauge(
     "pdns_read_current_status",
     "powerdns name resolution success status (-1=nodata,0=down,1=up,2=disruption)",
-    ["role", "miremad", "vanak"],
+    ["role"],
     registry=registry
 )
 
 pdns_write_current_status = Gauge(
     "pdns_write_current_status",
     "powerdns A record creation success status (-1=nodata,0=down,1=up,2=disruption)",
-    ["role", "datacenter"],
+    ["role"],
     registry=registry
 )
 
@@ -502,9 +502,7 @@ def collect_read_status():
 
     # No Data
     if me_read_success is None or vnk_read_success is None:
-        pdns_read_current_status.labels(role="secondary",
-                                        miremad="N/A",
-                                        vanak="N/A").set(-1)
+        pdns_read_current_status.labels(role="secondary").set(-1)
         raise RuntimeError(
             f"All DNS resolvers returned None for {PDNS_QUERY_RECORD}. "
             f"ME error: {me_status_read_error}, VNK error: {vnk_status_read_error}"
@@ -512,30 +510,22 @@ def collect_read_status():
 
     # ME & VNK UP
     if me_read_success and vnk_read_success:
-        pdns_read_current_status.labels(role="secondary",
-                                        miremad="UP",
-                                        vanak="UP").set(1)
+        pdns_read_current_status.labels(role="secondary").set(1)
         return
 
     # ME UP & VNK DOWN
     elif me_read_success and not vnk_read_success:
-        pdns_read_current_status.labels(role="secondary",
-                                        miremad="UP",
-                                        vanak="DOWN").set(1)
+        pdns_read_current_status.labels(role="secondary").set(1)
         return
 
     # ME DOWN & VNK UP
     elif not me_read_success and vnk_read_success:
-        pdns_read_current_status.labels(role="secondary",
-                                        miremad="DOWN",
-                                        vanak="UP").set(1)
+        pdns_read_current_status.labels(role="secondary").set(1)
         return
 
     # ME DOWN & VNK DOWN
     elif not me_read_success and not vnk_read_success:
-        pdns_read_current_status.labels(role="secondary",
-                                        miremad="DOWN",
-                                        vanak="DOWN").set(0)
+        pdns_read_current_status.labels(role="secondary").set(0)
         raise RuntimeError(
             f"All DNS resolvers failed for {PDNS_QUERY_RECORD}. "
             f"ME error: {me_status_read_error}, VNK error: {vnk_status_read_error}"
@@ -576,9 +566,9 @@ def collect_read_availability():
 
         raise RuntimeError(avail_read_error)
 
-    values = frames[0].get("data", {}).get("values", [])
+    values = frames[-1].get("data", {}).get("values", [])
     if len(values) < 2:
-        avail_read_error = f"unexpected Grafana response structure: {frames[0]}"
+        avail_read_error = f"unexpected Grafana response structure: {frames[-1]}"
         pdns_24h_availability_percent.labels(
             role="secondary",
             func="read",
@@ -667,9 +657,7 @@ def collect_write_status():
 
     # No Data
     if me_write_success is None:# or vnk_write_success is None:
-        pdns_write_current_status.labels(role="primary",
-                                        datacenter="Miremad"
-                                        ).set(-1)
+        pdns_write_current_status.labels(role="primary").set(-1)
         raise RuntimeError(
             f"No data returned for pdns_write_test() "
             f"ME error: {me_status_write_error}"#, VNK error: {vnk_status_read_error}"
@@ -677,9 +665,7 @@ def collect_write_status():
 
     # ME & VNK UP
     if me_write_success:# and vnk_read_success:
-        pdns_write_current_status.labels(role="primary",
-                                        datacenter="Miremad"
-                                        ).set(1)
+        pdns_write_current_status.labels(role="primary").set(1)
         return
 
     # ME UP & VNK DOWN
@@ -698,9 +684,7 @@ def collect_write_status():
 
     # ME DOWN & VNK DOWN
     elif not me_write_success:# and not vnk_write_success:
-        pdns_write_current_status.labels(role="primary",
-                                        datacenter="Miremad"
-                                        ).set(0)
+        pdns_write_current_status.labels(role="primary").set(0)
         raise RuntimeError(
             f"Primary DNS servers failed to create and delete {PDNS_WRITE_RECORD}. "
             f"ME error: {me_status_write_error}"#, VNK error: {vnk_status_read_error}"
@@ -740,9 +724,9 @@ def collect_write_availability():
 
         raise RuntimeError(avail_write_error)
 
-    values = frames[0].get("data", {}).get("values", [])
+    values = frames[-1].get("data", {}).get("values", [])
     if len(values) < 2:
-        avail_write_error = f"unexpected Grafana response structure: {frames[0]}"
+        avail_write_error = f"unexpected Grafana response structure: {frames[-1]}"
         pdns_24h_availability_percent.labels(
             role="primary",
             func="write",
