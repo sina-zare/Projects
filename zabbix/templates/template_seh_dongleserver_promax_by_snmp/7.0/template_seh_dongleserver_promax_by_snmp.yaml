@@ -564,7 +564,7 @@ zabbix_export:
           name: 'Connected USB Devices Count'
           type: CALCULATED
           key: seh.usb.connected.count
-          params: 'count(last_foreach(/*/seh.usb.status[*]),"gt",0)'
+          params: 'count(last_foreach(//seh.usb.status[*]),"gt",0)'
           triggers:
             - uuid: a2893399aa544b1f80629d1a8abef20a
               expression: 'last(/SEH Dongle Server ProMAX by SNMP/seh.usb.connected.count)=0'
@@ -1074,7 +1074,7 @@ zabbix_export:
           value: 'https://seh-dongleserver.promax'
           description: 'URL used by the "URL Check" web scenario'
         - macro: '{$SEH.USB.UTIL.MAX}'
-          value: '80'
+          value: '90'
           description: 'USB port capacity-usage warning threshold (%)'
         - macro: '{$SEH.UTN.PORT}'
           value: '9200'
@@ -1176,3 +1176,4 @@ zabbix_export:
         >= {$SEH.USB.UTIL.MAX}
       name: 'USB port utilization is above {$SEH.USB.UTIL.MAX}%'
       priority: HIGH
+      manual_close: 'YES'
