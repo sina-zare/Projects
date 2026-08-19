@@ -572,6 +572,7 @@ zabbix_export:
               recovery_expression: 'last(/SEH Dongle Server ProMAX by SNMP/seh.usb.connected.count)>0'
               name: 'No USB devices connected'
               priority: INFO
+              manual_close: 'YES'
         - uuid: 1c98992b94264708813659aed5664549
           name: 'Total USB Ports'
           type: SNMP_AGENT
@@ -605,13 +606,13 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: b093359f0d2144bebe216f44dc5f4893
+        - uuid: 344322cb2dd44d8b8237505783dc0646
           name: 'Number of unsupported items'
           type: INTERNAL
           key: 'zabbix[host,,items_unsupported]'
           description: 'Total number of unsupported items'
           triggers:
-            - uuid: 93719385c6544a69b45b6a536ac3829e
+            - uuid: acb991c0cac34e188c4a525b4a565bbc
               expression: 'last(/SEH Dongle Server ProMAX by SNMP/zabbix[host,,items_unsupported]) >= {$SEH.UNSUPPORTED.ITEMS.MAX}'
               name: 'Too many unsupported items on {HOST.NAME}'
               priority: WARNING
@@ -940,7 +941,9 @@ zabbix_export:
               trends: '0'
               trigger_prototypes:
                 - uuid: 072876d592344cf183fa96fb6c1a888e
-                  expression: 'find(/SEH Dongle Server ProMAX by SNMP/seh.usb.host[{#SNMPINDEX}], #1, "regexp","^Available$")=1'
+                  expression: 'last(/SEH Dongle Server ProMAX by SNMP/seh.usb.host[{#SNMPINDEX}])="Available"'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/SEH Dongle Server ProMAX by SNMP/seh.usb.host[{#SNMPINDEX}])<>"Available"'
                   name: 'USB Not Connected to any UTN Manager on Port {#PORT}'
                   priority: WARNING
                   description: 'USB exists but no host is connected.'
