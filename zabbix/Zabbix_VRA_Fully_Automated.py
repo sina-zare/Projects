@@ -25,7 +25,7 @@ except Exception as module_err:
 script_name = 'zabbix_vra_fully_automated'
 total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
 total_failed_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-failed-execs.txt'
-pushgateway_url = 'http://me-prometheus.abramad.com:9091'
+pushgateway_url = 'https://me-prometheus.abramad.com:9091'
 job_name = 'python_scripts'
 instance = script_name
 datacenter = 'vanak'
@@ -95,7 +95,7 @@ try:
         default_receivers = 'abramadsysops@abramad.com'
         error_receivers = 'abramadsysops@abramad.com, support@abramad.com'
         # default_cc = 'sina.z@abramad.com'
-        default_cc = 'sina.z@abramad.com'
+        default_cc = 'mehdi.a@abramad.com'
 
 
         def send_anonymous_email(from_email, to_email, cc_email, subject, html_message, direction,
@@ -203,7 +203,7 @@ try:
                                       sslContext=context)
         vra_content = vra_vc.RetrieveContent()
         vra_vm_view = vra_content.viewManager.CreateContainerView(vra_content.rootFolder, [vim.VirtualMachine], True)
-        vra_vms = [vm for vm in vra_vm_view.view if (vm.name.startswith("VRA-"))]
+        vra_vms = [vm for vm in vra_vm_view.view if (vm.name.startswith("VRA-") or vm.name.startswith("VRF-"))]
         # vra_vms = [vm for vm in vra_vm_view.view if (vm.name.lower().startswith("vra-nabigol"))]
         sorted_vms = sorted(vra_vms, key=lambda vm: vm.name.lower())
 
@@ -232,7 +232,7 @@ try:
             # Checking if vm is in 'VRA-1003-Customers' PortGroup
             if vm_portgroup.startswith(
                     'RA-Customers-N1003-VM') and vm.name.lower() != 'vra-amini2' and vm.name.lower() != 'vra-amini3' and vm.name.lower() != 'vra-demo' and vm.name.lower() != 'vra-bi1' and not vm.name.lower().startswith(
-                    'vra-haproxy') and vm.name.lower() != 'vra-pentest' and vm.name.lower() != 'vra-gildatest':
+                    'vra-haproxy') and vm.name.lower() != 'vra-pentest' and vm.name.lower() != 'vra-gildatest' and not vm.name.lower().startswith('vra-mha') and not vm.name.lower().startswith('vra-bitest') and not vm.name.lower().startswith('vra-4gconvert'):
 
                 # VM Name
                 vm_name = vm.name.lower()
@@ -342,13 +342,13 @@ try:
                 host_info = [hostname, hostid, status, host_url_macro]
 
                 # Categorize based on naming and status
-                if hostname.startswith('vra-') or hostname.startswith('vps-'):
+                if hostname.startswith('vra-') or hostname.startswith('vrf-'):
                     zabbix_vra_vms[hostname] = host_info
 
-                if ((hostname.startswith('vra-') or hostname.startswith('vps-')) and status == '1'):
+                if ((hostname.startswith('vra-') or hostname.startswith('vrf-')) and status == '1'):
                     zabbix_poff_vms[hostname] = host_info
 
-                elif ((hostname.startswith('vra-') or hostname.startswith('vps-')) and status == '0'):
+                elif ((hostname.startswith('vra-') or hostname.startswith('vrf-')) and status == '0'):
                     zabbix_pon_vms[hostname] = host_info
 
             #  Taking Group and Template IDs(host['host'].startswith('vra-') and host['status'] == '0')
@@ -357,6 +357,8 @@ try:
             host_group_name1 = "Rahkaran-Abri-Grp"  # Host group name
             host_group_name2 = "Support_Team"  # Host group name
             host_group_name3 = "Rahkaran-Abri-Different_URL"
+            host_group_name4 = "VRA"
+            host_group_name5 = "VRF"
 
             # Step 1: Get the template ID
             template = zapi.template.get(filter={"host": template_name})
@@ -382,6 +384,22 @@ try:
             else:
                 group_create = zapi.hostgroup.create(name=host_group_name3)
                 different_url_group_id = group_create['groupids'][0]
+
+            # Get or create the group "VRA"
+            host_group4 = zapi.hostgroup.get(filter={"name": host_group_name4})
+            if host_group4:
+                vra_group_id = host_group4[0]['groupid']
+            else:
+                group_create = zapi.hostgroup.create(name=host_group_name4)
+                vra_group_id = group_create['groupids'][0]
+
+            # Get or create the group "VRF"
+            host_group5 = zapi.hostgroup.get(filter={"name": host_group_name5})
+            if host_group5:
+                vrf_group_id = host_group5[0]['groupid']
+            else:
+                group_create = zapi.hostgroup.create(name=host_group_name5)
+                vrf_group_id = group_create['groupids'][0]
 
             #  Calculation Part
             # keys_equal = set(zabbix_pon_vms.keys()) == set(vcenter_pon_vms.keys())
@@ -530,11 +548,17 @@ try:
                         ]
 
                         # Step 3: Create the new host with description and visible name
+                        all_groups = [{"groupid": host_group_id1}, {"groupid": host_group_id2}]
+                        if host_name.lower().startswith('vra-'):
+                            all_groups.append({"groupid": vra_group_id})
+                        elif host_name.lower().startswith('vrf-'):
+                            all_groups.append({"groupid": vrf_group_id})
+
                         new_pon_host = zapi.host.create({
                             "host": host_name,  # Technical name of the host (internal name)
                             "name": host_visible_name,  # Visible name of the host in the frontend
                             "description": host_desc,  # Host description
-                            "groups": [{"groupid": host_group_id1}, {"groupid": host_group_id2}],  # Host group
+                            "groups": all_groups,  # Host group
                             "templates": [{"templateid": template_id}],  # Template
                             "tags": tags,
                             "macros": macros
@@ -681,7 +705,7 @@ try:
 
             # Logout from the Zabbix API session
             zapi.user.logout()
-            print('\nScript ended gracefully. ✅')
+            print('\nScript ended gracefully')
 
             print(f'Done: {zserver[1]}')
 
@@ -758,7 +782,7 @@ finally:
         registry=registry
     )
 
-    print('✅ Metrics Sent.')
+    print('Metrics Sent.')
 
 
 
