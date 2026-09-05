@@ -81,7 +81,7 @@ try:
     zabbix_nodes = {
         # Vanak
         'vop-zabbix': ['vop-zabbix', "http://172.29.6.7"],
-        'vvop-customerzabbix': ['vop-customerzabbix', "http://172.29.6.15"],
+        'vop-customerzabbix': ['vop-customerzabbix', "http://172.29.6.15"],
 
         # Miremad
         'me-zabbix': ['me-zabbix', "http://172.17.234.13/zabbix"],

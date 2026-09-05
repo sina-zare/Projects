@@ -457,6 +457,10 @@ try:
             "space": "ManSer",
             "title": "SysOps"
         },
+        "network": {
+            "space": "ManSer",
+            "title": "Network"
+        },
     }
 
 
