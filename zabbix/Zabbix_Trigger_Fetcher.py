@@ -220,128 +220,182 @@ password = decryptor('sysops-svc_enc', 'sysops-svc_key')
 
 iran_tz = timezone(timedelta(hours=3, minutes=30))
 
-for zbx_name, abx_addr in zabbix_nodes.items():
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    header = ["Zabbix Server", "Template", "Alert", "Severity", "Status", "Expression"]
-    worksheet.append(header)
+try:
+    for zbx_name, abx_addr in zabbix_nodes.items():
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        header = ["Zabbix Server", "Template", "Alert", "Severity", "Status", "Expression"]
+        worksheet.append(header)
 
-    generated_time = datetime.now(iran_tz).strftime("%Y-%m-%d %H:%M UTC+03:30")
+        generated_time = datetime.now(iran_tz).strftime("%Y-%m-%d %H:%M UTC+03:30")
 
-    html = f"""
-    <h1>{escape(zbx_name.upper())} Zabbix Template Triggers</h1>
+        html = f"""
+        <h1>{escape(zbx_name.upper())} Zabbix Template Triggers</h1>
+    
+        <p>
+            Generated automatically from Zabbix active templates.<br/>
+            Last update: {generated_time}<br/>
+        </p>"""
 
-    <p>
-        Generated automatically from Zabbix active templates.<br/>
-        Last update: {generated_time}<br/>
-    </p>"""
+        zapi = ZabbixAPI(abx_addr)
+        zapi.login(username, password)
 
-    zapi = ZabbixAPI(abx_addr)
-    zapi.login(username, password)
-
-    # Get all active templates
-    # Fetch all templates with linked hosts
-    templates_with_hosts = zapi.template.get(
-        selectHosts="extend",  # Get detailed host information
-        output=["templateid", "name"]  # Only fetch template ID and name
-    )
-
-    # Find templates that have at least one host attached
-    templates_with_at_least_one_host = [
-        template
-        for template in templates_with_hosts
-        if template['hosts']
-    ]
-
-    if templates_with_at_least_one_host:
-        print(f"Templates found: {len(templates_with_at_least_one_host)}")
-
-    for template in templates_with_at_least_one_host:
-        print(f"Checking template: {template['name']}")
-
-        triggers = zapi.trigger.get(
-            output=[
-                "description",
-                "expression",
-                "priority",
-                "status"
-            ],
-            templateids=template["templateid"],
-            expandExpression=True
+        # Get all active templates
+        # Fetch all templates with linked hosts
+        templates_with_hosts = zapi.template.get(
+            selectHosts="extend",  # Get detailed host information
+            output=["templateid", "name"]  # Only fetch template ID and name
         )
 
-        print(f"Triggers found: {len(triggers)}")
+        # Find templates that have at least one host attached
+        templates_with_at_least_one_host = [
+            template
+            for template in templates_with_hosts
+            if template['hosts']
+        ]
 
-        trigger_prototypes = zapi.triggerprototype.get(
-            output=[
-                "description",
-                "expression",
-                "priority",
-                "status"
-            ],
-            templateids=template["templateid"],
-            expandExpression=True
+        if templates_with_at_least_one_host:
+            print(f"Templates found: {len(templates_with_at_least_one_host)}")
+
+        for template in templates_with_at_least_one_host:
+            print(f"Checking template: {template['name']}")
+
+            triggers = zapi.trigger.get(
+                output=[
+                    "description",
+                    "expression",
+                    "priority",
+                    "status"
+                ],
+                templateids=template["templateid"],
+                expandExpression=True
+            )
+
+            print(f"Triggers found: {len(triggers)}")
+
+            trigger_prototypes = zapi.triggerprototype.get(
+                output=[
+                    "description",
+                    "expression",
+                    "priority",
+                    "status"
+                ],
+                templateids=template["templateid"],
+                expandExpression=True
+            )
+
+            print(f"Trigger prototypes found: {len(trigger_prototypes)}")
+
+            template_rows = []
+
+            for trigger in triggers:
+                row = {
+                    "zabbix_server": zbx_name,
+                    "template": template["name"],
+                    "trigger": trigger["description"],
+                    "expression": trigger["expression"],
+                    "severity": severity_map[trigger["priority"]],
+                    "status": "enabled" if trigger["status"] == "0" else "disabled"
+                }
+                template_rows.append(row)
+
+            for trigger in trigger_prototypes:
+                row = {
+                    "zabbix_server": zbx_name,
+                    "template": template["name"],
+                    "trigger": trigger["description"],
+                    "expression": trigger["expression"],
+                    "severity": severity_map[trigger["priority"]],
+                    "status": "enabled" if trigger["status"] == "0" else "disabled",
+                }
+                template_rows.append(row)
+
+            for r in template_rows:
+                worksheet.append([
+                    r["zabbix_server"],
+                    r["template"],
+                    r["trigger"],
+                    r["severity"],
+                    r["status"],
+                    r["expression"],
+                ])
+
+            html += generate_html(
+                zbx_name,
+                template["name"],
+                template_rows
+            )
+
+        iran_date = datetime.now(iran_tz).strftime("%Y_%m_%d")
+        excel_dir = f"C:/Temp/{script_name}/reports"
+        os.makedirs(excel_dir, exist_ok=True)
+        excel_path = f"{excel_dir}/{zbx_name}_triggers_{iran_date}.xlsx"
+        workbook.save(excel_path)
+
+        confluence = Confluence(
+            url='https://confluence.abramad.com',
+            username=username,
+            password=password,
+            verify_ssl=False
         )
 
-        print(f"Trigger prototypes found: {len(trigger_prototypes)}")
-
-        template_rows = []
-
-        for trigger in triggers:
-            row = {
-                "zabbix_server": zbx_name,
-                "template": template["name"],
-                "trigger": trigger["description"],
-                "expression": trigger["expression"],
-                "severity": severity_map[trigger["priority"]],
-                "status": "enabled" if trigger["status"] == "0" else "disabled"
-            }
-            template_rows.append(row)
-
-        for trigger in trigger_prototypes:
-            row = {
-                "zabbix_server": zbx_name,
-                "template": template["name"],
-                "trigger": trigger["description"],
-                "expression": trigger["expression"],
-                "severity": severity_map[trigger["priority"]],
-                "status": "enabled" if trigger["status"] == "0" else "disabled",
-            }
-            template_rows.append(row)
-
-        for r in template_rows:
-            worksheet.append([
-                r["zabbix_server"],
-                r["template"],
-                r["trigger"],
-                r["severity"],
-                r["status"],
-                r["expression"],
-            ])
-
-        html += generate_html(
-            zbx_name,
-            template["name"],
-            template_rows
+        publish_page(
+            confluence=confluence,
+            space="ManSer",
+            title=zbx_name,
+            html=html,
+            excel_file_path=excel_path
         )
 
-    iran_date = datetime.now(iran_tz).strftime("%Y_%m_%d")
-    excel_dir = f"C:/Temp/{script_name}/reports"
-    os.makedirs(excel_dir, exist_ok=True)
-    excel_path = f"{excel_dir}/{zbx_name}_triggers_{iran_date}.xlsx"
-    workbook.save(excel_path)
+except Exception as e:
+    success = False
+    error_string_summary += f"{type(e).__name__}: {e}"
 
-    confluence = Confluence(
-        url='https://confluence.abramad.com',
-        username=username,
-        password=password,
-        verify_ssl=False
+    # Get the traceback and extract the last traceback frame
+    tb = traceback.extract_tb(e.__traceback__)
+    last_call = tb[-1]  # the last traceback frame, where the exception occurred
+    error_string_detail += f"Error occurred in line {last_call.lineno}: {last_call.line}"
+    print(f"Script failed: {error_string_summary}\n{error_string_detail}")
+
+
+finally:
+    # Finalizing Metrics
+    # Script Duration
+    duration = time.time() - start_time
+    duration_gauge.set(duration)
+
+    #Script Success Status
+    status_gauge.set(1 if success else 0)
+
+    # Script Total Executions
+    total_exec_counts = read_value_from_file(total_exec_counter_file) + 1
+    write_value_to_file(total_exec_counter_file, total_exec_counts)
+    total_execution_counter.inc(total_exec_counts)
+
+    if not success:
+        # Script Total Failed Executions
+        total_failed_exec_counts = read_value_from_file(total_failed_exec_counter_file) + 1
+        write_value_to_file(total_failed_exec_counter_file, total_failed_exec_counts)
+        total_failed_execution_counter.inc(total_failed_exec_counts)
+
+        # Script Last Error Message
+        last_error_message.labels(error_summary=error_string_summary, error_detail=error_string_detail).set(1)
+
+    elif success:
+        # Script Total Failed Executions
+        total_failed_exec_counts = read_value_from_file(total_failed_exec_counter_file)
+        total_failed_execution_counter.inc(total_failed_exec_counts)
+
+        # Script Last Error Message
+        last_error_message.labels(error_summary="None", error_detail="None").set(0)
+
+
+    # Push metrics to Pushgateway
+    push_to_gateway(
+        gateway=pushgateway_url,
+        job=job_name,
+        grouping_key={'instance': instance, 'target': target, 'datacenter': push_datacenter },
+        registry=registry
     )
 
-    publish_page(
-        confluence=confluence,
-        space="ManSer",
-        title=zbx_name,
-        html=html,
-        excel_file_path=excel_path
-    )
+    print('Metrics Sent.')
