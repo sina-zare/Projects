@@ -100,7 +100,7 @@ def generate_html(zbx_name, template_name, rows):
     """
 
     row_colors = {
-        "enabled": "#d9ead3",   # light green
+        "enabled": "#d9ead3",  # light green
         "disabled": "#f4cccc",  # light red
     }
 
@@ -125,33 +125,24 @@ def generate_html(zbx_name, template_name, rows):
 
 
 def publish_page(
-        confluence,
-        space,
-        title,
-        html,
-        excel_file_path=None,
-        parent_id=None
+    confluence,
+    space,
+    title,
+    html,
+    excel_file_path=None,
+    parent_id=None
 ):
     """
-    Create or update a Confluence page and optionally upload an Excel attachment.
-
-    Parameters:
-        confluence      : Atlassian Confluence object
-        space           : Confluence space key (e.g. "ManSer")
-        title           : Page title
-        html            : Page body (storage format)
-        excel_file_path : Optional path to XLSX file to attach
-        parent_id       : Optional parent page ID
+    Create/update Confluence page and optionally upload attachment
     """
 
     existing_page = confluence.get_page_by_title(
-        space_key=space,
+        space=space,
         title=title
     )
 
-    # Page exists
-    if existing_page.get("size", 0) > 0:
-        page_id = existing_page["results"][0]["id"]
+    if existing_page:
+        page_id = existing_page["id"]
 
         print(f"[INFO] Updating existing page: {title}")
 
@@ -163,7 +154,6 @@ def publish_page(
             full_width=True
         )
 
-    # Page does not exist
     else:
         print(f"[INFO] Creating new page: {title}")
 
@@ -180,6 +170,7 @@ def publish_page(
 
     # Upload Excel attachment
     if excel_file_path and os.path.exists(excel_file_path):
+
         attachment_name = os.path.basename(excel_file_path)
 
         print(f"[INFO] Uploading attachment: {attachment_name}")
@@ -195,7 +186,6 @@ def publish_page(
 
     return page_id
 
-
 severity_map = {
     "0": "Not classified",
     "1": "Information",
@@ -208,7 +198,7 @@ severity_map = {
 zabbix_nodes = {
     # Vanak
     'VNK-Zabbix': "https://vnk-zabbix.abramad.com",
-    'VNK-CustomerZabbix': "https://vnk-customerzabbix.abramad.com",
+    'VNK-CustomerZabbix': "http://172.29.6.15",
 
     # Miremad
     'ME-Zabbix': "https://me-zabbix.abramad.com/zabbix",
@@ -231,7 +221,7 @@ try:
 
         html = f"""
         <h1>{escape(zbx_name.upper())} Zabbix Template Triggers</h1>
-    
+
         <p>
             Generated automatically from Zabbix active templates.<br/>
             Last update: {generated_time}<br/>
@@ -347,6 +337,7 @@ try:
             excel_file_path=excel_path
         )
 
+
 except Exception as e:
     success = False
     error_string_summary += f"{type(e).__name__}: {e}"
@@ -364,7 +355,7 @@ finally:
     duration = time.time() - start_time
     duration_gauge.set(duration)
 
-    #Script Success Status
+    # Script Success Status
     status_gauge.set(1 if success else 0)
 
     # Script Total Executions
@@ -389,12 +380,11 @@ finally:
         # Script Last Error Message
         last_error_message.labels(error_summary="None", error_detail="None").set(0)
 
-
     # Push metrics to Pushgateway
     push_to_gateway(
         gateway=pushgateway_url,
         job=job_name,
-        grouping_key={'instance': instance, 'target': target, 'datacenter': push_datacenter },
+        grouping_key={'instance': instance, 'target': target, 'datacenter': push_datacenter},
         registry=registry
     )
 
