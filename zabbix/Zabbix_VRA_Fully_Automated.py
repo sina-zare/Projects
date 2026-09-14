@@ -331,8 +331,8 @@ try:
                 if vm_power.endswith('off') and vra_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
                     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
-                elif vm_nic_status == 'disconnected':  # and vra_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
-                    vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
+                # elif vm_nic_status == 'disconnected':  # and vra_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
+                #     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
                 elif vm_power.endswith('on') and vm_nic_status == 'connected':
                     vcenter_pon_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
