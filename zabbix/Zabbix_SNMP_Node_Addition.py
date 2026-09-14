@@ -118,15 +118,15 @@ def zabbix_node_adder(url, username, password, hosts_dict, template_list, host_g
 
 
 # Zabbix server credentials
-zabbix_url = "http://172.17.234.13/zabbix"
+zabbix_url = "https://vnk-zabbix.abramad.com"
 zabbix_user = "sysops-svc"
 zabbix_password = decryptor('sysops-svc_enc', 'sysops-svc_key')
 
-zabbix_templates = ["F5 Big-IP by SNMP"]
-zabbix_host_groups = ["Security_Team", "WAF"]
+zabbix_templates = ["ICMP Ping IP"]
+zabbix_host_groups = ["Kubernetes_Team"]
 zabbix_tags = [
         {"tag": "Note", "value": ""},
-        {"tag": "Owner", "value": "Security_Team"},
+        {"tag": "Owner", "value": "Kubernetes_Team"},
         {"tag": "__zbx_jira", "value": "1"}
     ]
 

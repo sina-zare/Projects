@@ -101,17 +101,17 @@ def get_data_by_hostgroup(zabbix_url, zabbix_user, zabbix_password, hostgroup_na
 
 # Zabbix server credentials
 zabbix_urls = {
-    'ME-Zabbix': 'https://me-zabbix.abramad.com/zabbix',
+    #'ME-Zabbix': 'https://me-zabbix.abramad.com/zabbix',
     'VNK-Zabbix': 'https://vnk-zabbix.abramad.com',
 }
 
-hostgroup_name = "Hypervisors"
+hostgroup_name = "Kubernetes_Team"
 
 zabbix_templates = ["ICMP Ping IP"]
 
 zabbix_tags = [
     {"tag": "Note", "value": ""},
-    {"tag": "Owner", "value": "CSB_Team"},
+    {"tag": "Owner", "value": "	Kubernetes_Team"},
     {"tag": "__zbx_jira", "value": "1"}
 ]
 

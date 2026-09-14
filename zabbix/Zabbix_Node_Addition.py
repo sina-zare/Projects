@@ -25,14 +25,15 @@ except Exception as f_err:
 
 try:
     # Zabbix server credentials
-    zabbix_url = "http://zabbix.url/zabbix"
-    zabbix_user = "username"
-    zabbix_password = decryptor("pass-val","pass-key")
+    zabbix_url = "https://vnk-zabbix.abramad.com"
+    zabbix_user = "sysops-svc"
+    zabbix_password = decryptor('sysops-svc_enc', 'sysops-svc_key')
+
 
 
     # Template and Host Group
-    template_name = "template-name"  # Template name
-    host_group_name = "host-group-name"  # Host group name
+    template_name = "ICMP Ping IP"  # Template name
+    host_group_name = "Kubernetes_Team"  # Host group name
 
     # Host information
     host_name = "my-hostname"  # {HOST.HOST}
