@@ -29,7 +29,7 @@ try:
         script_name = 'zabbix_onprem_url_me_fully_automated'
         total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
         total_failed_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-failed-execs.txt'
-        pushgateway_url = 'http://me-prometheus.abramad.com:9091'
+        pushgateway_url = 'https://me-prometheus.abramad.com:9091'
         job_name = 'python_scripts'
         instance = script_name
         datacenter = 'miremad'
@@ -114,9 +114,35 @@ try:
         default_receivers = 'abramadsysops@abramad.com'
         error_receivers = 'abramadsysops@abramad.com, support@abramad.com'
         # default_cc = 'sina.z@abramad.com'
-        default_cc = 'sina.z@abramad.com'
+        default_cc = 'mehdi.a@abramad.com'
         zabbix_server = "vnk-customerzabbix@abramad.com"
 
+        me_key_map = {
+            104: "vm_creation_date",
+            401: "vm_shutdown_date",
+            1202: "vm_company_name",
+            603: "vm_public_ip",
+            1405: "vm_creation_ticket_no",
+            1406: "vm_shutdown_ticket_no",
+            1206: "vm_disconnect_ticket_no",
+            611: "vm_national_no",
+            102: "vm_backup_status",
+            604: "vm_url",
+            703: "vm_ipsids_status",
+            902: "vm_not_monitored_status",
+            903: "vm_in_dept_status",
+            1001: "vm_owner",
+            701: "vm_dongle_status",
+            702: "vm_site_to_site_status",
+            705: "vm_vip_status",
+            704: "vm_waf_status",
+            1203: "vm_rep_name",
+            1204: "vm_rep_no",
+            1205: "vm_rep_email",
+            1304: "vm_product_line",
+            1403: "vm_native_backup_status",
+            1305: "vm_sepidar_lock_no",
+        }
 
         def send_anonymous_email(from_email, to_email, cc_email, subject, html_message, direction,
                                  mail_server='mail.abramad.com'):
@@ -343,13 +369,24 @@ try:
                 if i.key == 1003:
                     vm_vip_status = i.value
 
+            # get vm custom attributes
+            vm_attrs = {}
+            for attr in vm.summary.customValue:
+                if attr.key in me_key_map:
+                    vm_attrs[me_key_map[attr.key]] = attr.value
+
+            # set vm custom attributes
+            vm_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+            vm_disconnect_ticket_id = vm_attrs.get('vm_disconnect_ticket_no', 'Null')
+
+
             # Distinguishing VMs
             try:
                 # Taking All Customers
                 vcenter_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id,
                                         vm_vip_status, vm_not_monitored_status]
 
-                if vm_power_state == 'poweredoff':
+                if vm_power_state == 'poweredoff' and vm_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set:
                     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip,
                                                  vm_national_id, vm_vip_status, vm_not_monitored_status]
 
@@ -362,7 +399,7 @@ try:
                     #    print(f'key: {i.key}\nvalue: {i.value}')
 
                     try:
-                        if days_between_persian_dates(vm_creation_date, vm_name) > 0:
+                        if True: #days_between_persian_dates(vm_creation_date, vm_name) > 0:
                             # print('#############\n')
                             # Find powered-on VMs
                             vcenter_pon_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip,
@@ -372,7 +409,7 @@ try:
                             if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
                                 for device in vm.config.hardware.device:
                                     if isinstance(device, vim.vm.device.VirtualEthernetCard):
-                                        if not device.connectable.connected:
+                                        if not device.connectable.connected and vm_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set:
                                             vcenter_in_debt_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name,
                                                                             vm_public_ip, vm_national_id, vm_vip_status,
                                                                             vm_not_monitored_status]
@@ -917,8 +954,7 @@ try:
 
         #  Not Monitored
         for vc_not_monitored in set(vcenter_pon_vms.keys()):
-            if (vc_not_monitored in set(zabbix_enabled_vms.keys()) and vcenter_pon_vms[vc_not_monitored][
-                7] == '1'):  # Node Needs to be disabled
+            if (vc_not_monitored in set(zabbix_enabled_vms.keys()) and vcenter_pon_vms[vc_not_monitored][7] == '1'):  # Node Needs to be disabled
                 try:
                     # Host information
                     host_name = zabbix_enabled_vms[vc_not_monitored][0]

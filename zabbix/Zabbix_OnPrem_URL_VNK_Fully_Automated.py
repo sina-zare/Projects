@@ -1,6 +1,7 @@
 try:
     error_string_summary = ""
     error_string_detail = ""
+    import time
 
     try:
         from email.mime.multipart import MIMEMultipart
@@ -20,18 +21,16 @@ try:
         import jdatetime
         import warnings
         import smtplib
-        import time
         import ssl
         import os
         from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
         import traceback
-        import time
 
         # --- Configuration ---
         script_name = 'zabbix_onprem_url_vnk_fully_automated'
         total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
         total_failed_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-failed-execs.txt'
-        pushgateway_url = 'http://me-prometheus.abramad.com:9091'
+        pushgateway_url = 'https://me-prometheus.abramad.com:9091'
         job_name = 'python_scripts'
         instance = script_name
         datacenter = 'vanak'
@@ -119,10 +118,35 @@ try:
         default_receivers = 'abramadsysops@abramad.com'
         error_receivers = 'support@abramad.com, abramadsysops@abramad.com'
         #default_cc = 'sina.z@abramad.com'
-        default_cc = 'sina.z@abramad.com'
+        default_cc = 'mehdi.a@abramad.com'
         zabbix_server = "me-customerzabbix@abramad.com"
 
-
+        vab_key_map = {
+            301: "vm_creation_date",
+            311: "vm_shutdown_date",
+            620: "vm_company_name",
+            302: "vm_public_ip",
+            402: "vm_creation_ticket_no",
+            501: "vm_shutdown_ticket_no",
+            614: "vm_disconnect_ticket_no",
+            306: "vm_national_no",
+            102: "vm_backup_status",
+            303: "vm_url",
+            304: "vm_ipsids_status",
+            305: "vm_in_dept_status",
+            307: "vm_not_monitored_status",
+            308: "vm_owner",
+            309: "vm_dongle_status",
+            312: "vm_site_to_site_status",
+            314: "vm_vip_status",
+            315: "vm_waf_status",
+            602: "vm_rep_name",
+            603: "vm_rep_no",
+            604: "vm_rep_email",
+            611: "vm_product_line",
+            615: "vm_native_backup_status",
+            612: "vm_sepidar_lock_no",
+        }
 
 
         def send_anonymous_email(from_email, to_email, cc_email, subject, html_message, direction,
@@ -216,7 +240,8 @@ try:
 
                 # Calculate the difference in days
                 delta = (today_date - input_date).days
-
+                if vm_name.startswith('vr2-datis'):
+                    print(f'days_between_persian_dates\n{vm_name}, {delta}')
                 return delta
 
             except Exception as err:
@@ -359,35 +384,52 @@ try:
                 if i.key == 316:
                     vm_vip_status = i.value
 
+            # get vm custom attributes
+            vm_attrs = {}
+            for attr in vm.summary.customValue:
+                if attr.key in vab_key_map:
+                    vm_attrs[vab_key_map[attr.key]] = attr.value
+
+            # set vm custom attributes
+            vm_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+            vm_disconnect_ticket_id = vm_attrs.get('vm_disconnect_ticket_no', 'Null')
+
 
             # Distinguishing VMs
             try:
                 # Taking All Customers
                 vcenter_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id, vm_vip_status, vm_not_monitored_status]
-
-                if vm_power_state == 'poweredoff':
+                #print(vcenter_vms[vm_name])
+                #print(f"{vm_power_state}\n\n")
+                #if vm_name.startswith('vr2-datis'):
+                #    print(f'Found among all vcenter vms: \n{vcenter_vms[vm_name]}')
+                if vm_power_state == 'poweredoff' and vm_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
                     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id, vm_vip_status, vm_not_monitored_status]
 
+                    #if vm_name.startswith('vr2-datis'):
+                    #    print(f'Found among powered off vcenter vms: \n{vcenter_vms[vm_name]}')
 
                 # Check if app is deployed
                 if vm_power_state == 'poweredon':
 
+                    # if vm_name.startswith('vr2-datis'):
+                    #     print(f'Found among all poweredon vms: \n{vcenter_vms[vm_name]}')
                     #print(vm_name)
                     #custom_value = vm.summary.customValue
                     #for i in custom_value:
                     #    print(f'key: {i.key}\nvalue: {i.value}')
 
                     try:
-                        if days_between_persian_dates(vm_creation_date, vm_name) > 0:
+                        if True: #days_between_persian_dates(vm_creation_date, vm_name) > 0:
                             #print('#############\n')
                             # Find powered-on VMs
                             vcenter_pon_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id, vm_vip_status, vm_not_monitored_status]
-
+                            print(f'vc powered on: {vcenter_pon_vms[vm_name]}')
                             # Find powered-on VMs with disconnected NICs
                             if vm.runtime.powerState == vim.VirtualMachinePowerState.poweredOn:
                                 for device in vm.config.hardware.device:
                                     if isinstance(device, vim.vm.device.VirtualEthernetCard):
-                                        if not device.connectable.connected:
+                                        if not device.connectable.connected and vm_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
                                             vcenter_in_debt_vms[vm_name] = [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id, vm_vip_status, vm_not_monitored_status]
                                             break
                     except Exception as calc_err:
@@ -464,6 +506,7 @@ try:
                 hostid = host['hostid']
                 hostname = host['host']
                 status = host['status']
+                print(f'Zabbix: {hostname} {status}')
 
                 # Get macros for this host
                 macros = zapi.usermacro.get(hostids=hostid, output=['macro', 'value'])
@@ -703,7 +746,9 @@ try:
                     if (vcenter_pon_vms[vc_pon][0].startswith('vr1-') or vcenter_pon_vms[vc_pon][0].startswith('vr2-') or vcenter_pon_vms[vc_pon][0].startswith('vr3-')) and vcenter_pon_vms[vc_pon][7] != '1':  # Excluding not monitored
 
                         #  [vm_name, vm_url, vm_fqdn, vm_persian_name, vm_public_ip, vm_national_id, vm_vip_status, vm_not_monitored_status]
-
+                        if vcenter_pon_vms[vc_pon][0].startswith('vr2-datis'):
+                            print('$$$$$$$$$$$$$$$$$$$')
+                            print(vcenter_pon_vms[vc_pon])
                         if vcenter_pon_vms[vc_pon][6] == '1' and vcenter_pon_vms[vc_pon][1] != 'No_URL':  # Distinguishing VIPs
                             # Host information
                             host_name = vcenter_pon_vms[vc_pon][0]  # {HOST.HOST}
@@ -884,6 +929,7 @@ try:
                     try:
                         # Host information
                         host_name = zabbix_disabled_vms[vc_pon][0]
+                        #print(host_name)
                         host_id = zabbix_disabled_vms[vc_pon][1]
                         # enable the host
                         zapi.host.update({

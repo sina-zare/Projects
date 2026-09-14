@@ -25,7 +25,7 @@ import os
 script_name = 'zabbix_agent_manager_vnk_fully_automated'
 total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
 total_failed_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-failed-execs.txt'
-pushgateway_url = 'http://me-prometheus.abramad.com:9091'
+pushgateway_url = 'https://me-prometheus.abramad.com:9091'
 job_name = 'python_scripts'
 instance = script_name
 datacenter = 'vanak'
@@ -93,7 +93,7 @@ try:
     default_receivers = 'abramadsysops@abramad.com'
     error_receivers = 'support@abramad.com, abramadsysops@abramad.com'
     #default_cc = 'sina.z@abramad.com'
-    default_cc = 'sina.z@abramad.com'
+    default_cc = 'mehdi.a@abramad.com'
     username = 'sysops-svc@abramad.com'
     password = decryptor('sysops-svc_enc', 'sysops-svc_key')
 
@@ -109,6 +109,59 @@ try:
 
         ]
 
+    vab_key_map = {
+        301: "vm_creation_date",
+        311: "vm_shutdown_date",
+        620: "vm_company_name",
+        302: "vm_public_ip",
+        402: "vm_creation_ticket_no",
+        501: "vm_shutdown_ticket_no",
+        614: "vm_disconnect_ticket_no",
+        306: "vm_national_no",
+        102: "vm_backup_status",
+        303: "vm_url",
+        304: "vm_ipsids_status",
+        305: "vm_in_dept_status",
+        307: "vm_not_monitored_status",
+        308: "vm_owner",
+        309: "vm_dongle_status",
+        312: "vm_site_to_site_status",
+        314: "vm_vip_status",
+        315: "vm_waf_status",
+        602: "vm_rep_name",
+        603: "vm_rep_no",
+        604: "vm_rep_email",
+        611: "vm_product_line",
+        615: "vm_native_backup_status",
+        612: "vm_sepidar_lock_no",
+    }
+
+    vra_key_map = {
+        # 301: "vm_creation_date",
+        1102: "vm_shutdown_date",
+        # 620: "vm_company_name",
+        # 302: "vm_public_ip",
+        # 402: "vm_creation_ticket_no",
+        1101: "vm_shutdown_ticket_no",
+        #614: "vm_disconnect_ticket_no",
+        # 306: "vm_national_no",
+        # 102: "vm_backup_status",
+        # 303: "vm_url",
+        # 304: "vm_ipsids_status",
+        # 305: "vm_in_dept_status",
+        # 307: "vm_not_monitored_status",
+        # 308: "vm_owner",
+        # 309: "vm_dongle_status",
+        # 312: "vm_site_to_site_status",
+        # 314: "vm_vip_status",
+        # 315: "vm_waf_status",
+        # 602: "vm_rep_name",
+        # 603: "vm_rep_no",
+        # 604: "vm_rep_email",
+        # 611: "vm_product_line",
+        # 615: "vm_native_backup_status",
+        # 612: "vm_sepidar_lock_no",
+    }
 
     def send_anonymous_email(from_email, to_email, cc_email, subject, html_message, direction,
                              mail_server='mail.abramad.com'):
@@ -249,11 +302,23 @@ try:
                             nic_connected = device.connectable.connected
                             vm_nic_status = "connected" if nic_connected else "disconnected"
 
+                    # get vm custom attributes
+                    vm_attrs = {}
+                    for attr in vm.summary.customValue:
+                        if attr.key in vra_key_map:
+                            vm_attrs[vra_key_map[attr.key]] = attr.value
+
+                    # set vm custom attributes
+                    vra_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+                    #vra_disconnect_ticket_id = vm_attrs.get('vm_disconnect_ticket_no', 'Null')
 
                     #  Distinguishing VMs
                     vcenter_abri_vms[vm_name.lower()] = [vm_name]
 
-                    if vm_power_state.endswith('off') or vm_nic_status == 'disconnected':
+                    if vm_power_state.endswith('off') and vra_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
+                        vcenter_abri_poff_vms[vm_name.lower()] = [vm_name]
+
+                    elif vm_nic_status == 'disconnected': #and vra_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
                         vcenter_abri_poff_vms[vm_name.lower()] = [vm_name]
 
                     elif vm_power_state.endswith('on') and vm_nic_status == 'connected':
@@ -315,10 +380,23 @@ try:
                         nic_connected = device.connectable.connected
                         vm_nic_status = "connected" if nic_connected else "disconnected"
 
+                # get vm custom attributes
+                vm_attrs = {}
+                for attr in vm.summary.customValue:
+                    if attr.key in vab_key_map:
+                        vm_attrs[vab_key_map[attr.key]] = attr.value
+
+                # set vm custom attributes
+                vab_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+                vab_disconnect_ticket_id = vm_attrs.get('vm_disconnect_ticket_no', 'Null')
+
                 #  Distinguishing VMs
                 vcenter_onprem_vms[vm_name.lower()] = [vm_name]
 
-                if vm_power_state.endswith('off') or vm_nic_status == 'disconnected':
+                if vm_power_state.endswith('off') and vab_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
+                    vcenter_onprem_poff_vms[vm_name.lower()] = [vm_name]
+
+                elif vm_nic_status == 'disconnected' and vab_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
                     vcenter_onprem_poff_vms[vm_name.lower()] = [vm_name]
 
                 elif vm_power_state.endswith('on') and vm_nic_status == 'connected':
@@ -726,7 +804,7 @@ try:
                     # attachments=[]
                 )
 
-        print('\nScript ended gracefully. ✅')
+        print('\nScript ended gracefully.')
 
 
     except Exception as body_error:
@@ -807,7 +885,7 @@ finally:
         registry=registry
     )
 
-    print('✅ Metrics Sent.')
+    print(' Metrics Sent.')
 
 
 

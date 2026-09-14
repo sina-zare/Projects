@@ -189,6 +189,33 @@ try:
     #################################################
     ################ Data Gathering #################
 
+    vra_key_map = {
+        # 301: "vm_creation_date",
+        1102: "vm_shutdown_date",
+        # 620: "vm_company_name",
+        # 302: "vm_public_ip",
+        # 402: "vm_creation_ticket_no",
+        1101: "vm_shutdown_ticket_no",
+        # 614: "vm_disconnect_ticket_no",
+        # 306: "vm_national_no",
+        # 102: "vm_backup_status",
+        # 303: "vm_url",
+        # 304: "vm_ipsids_status",
+        # 305: "vm_in_dept_status",
+        # 307: "vm_not_monitored_status",
+        # 308: "vm_owner",
+        # 309: "vm_dongle_status",
+        # 312: "vm_site_to_site_status",
+        # 314: "vm_vip_status",
+        # 315: "vm_waf_status",
+        # 602: "vm_rep_name",
+        # 603: "vm_rep_no",
+        # 604: "vm_rep_email",
+        # 611: "vm_product_line",
+        # 615: "vm_native_backup_status",
+        # 612: "vm_sepidar_lock_no",
+    }
+
     try:
         print('Starting vCenter data gathering')
         # Ignore the warning
@@ -269,17 +296,17 @@ try:
                 vm_url = vm_url.strip().lower()
 
                 # Ensure https
-                if not vm_url.startswith('https://'):
-                    vm_url = 'https://' + vm_url.lstrip('http://')
+                # if not vm_url.startswith('https://'):
+                #     vm_url = 'https://' + vm_url.lstrip('http://')
 
                 # Remove trailing slash for clean comparison
-                url_wo_scheme = vm_url.replace('https://', '').rstrip('/')
+                #url_wo_scheme = vm_url.replace('https://', '').rstrip('/')
 
                 # If it's empty or just `.rahkaran.ir`, fall back to default
-                if url_wo_scheme in ['', '.rahkaran.ir']:
-                    vm_url = default_url
-                elif not url_wo_scheme.endswith('.rahkaran.ir'):
-                    vm_url = f'https://{url_wo_scheme}.rahkaran.ir'
+                # if url_wo_scheme in ['', '.rahkaran.ir']:
+                #     vm_url = default_url
+                # elif not url_wo_scheme.endswith('.rahkaran.ir') or not url_wo_scheme.endswith('.rahkaran.ir/sg'):
+                #     vm_url = f'https://{url_wo_scheme}.rahkaran.ir'
 
                 # Get NIC connection status
                 vm_nic_status = ''
@@ -289,11 +316,24 @@ try:
                         nic_connected = device.connectable.connected
                         vm_nic_status = "connected" if nic_connected else "disconnected"
 
+                # get vm custom attributes
+                vm_attrs = {}
+                for attr in vm.summary.customValue:
+                    if attr.key in vra_key_map:
+                        vm_attrs[vra_key_map[attr.key]] = attr.value
+
+                # set vm custom attributes
+                vra_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+
                 #  Distinguishing VMs
                 vcenter_vra_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
-                if vm_power.endswith('off') or vm_nic_status == 'disconnected':
+                if vm_power.endswith('off') and vra_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
                     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
+
+                elif vm_nic_status == 'disconnected':  # and vra_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
+                    vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
+
                 elif vm_power.endswith('on') and vm_nic_status == 'connected':
                     vcenter_pon_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
