@@ -53,11 +53,15 @@ try:
         return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
     # Zabbix API connection
-    zabbix_selection = input('Select Server:\n1) ME-CustomerZabbix\n2) VNK-CustomerZabbix\n> ')
+    zabbix_selection = input('Select Server:\n1) ME-CustomerZabbix\n2) VNK-CustomerZabbix\n3) ME-Zabbix\n4) VNK-Zabbix\n> ')
     if zabbix_selection == '1':
         zabbix_url = 'https://me-customerzabbix.abramad.com'
     elif zabbix_selection == '2':
         zabbix_url = 'https://vnk-customerzabbix.abramad.com'
+    elif zabbix_selection == '3':
+        zabbix_url = 'https://me-zabbix.abramad.com/zabbix'
+    elif zabbix_selection == '4':
+        zabbix_url = 'https://vnk-zabbix.abramad.com'
     else:
         'Wrong Selection\nTerminating Script'
         time.sleep(2)
