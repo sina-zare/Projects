@@ -253,6 +253,7 @@ def generate_html(team, rows):
           <tbody>
 
             <tr>
+              <th>State</th>
               <th>Datacenter</th>
               <th>Alert</th>
               <th>Team</th>
@@ -265,8 +266,18 @@ def generate_html(team, rows):
     """
 
     for r in rows:
+        alert_state = str(r.get("state", "")).lower()
+
+        if alert_state == "enabled":
+            row_style = ' style="background-color:#d9ead3;"'
+        elif alert_state == "disabled":
+            row_style = ' style="background-color:#f4cccc;"'
+        else:
+            row_style = ""
+
         html += f"""
-            <tr>
+            <tr{row_style}>
+              <td>{escape(str(r.get("state", "")))}</td>
               <td>{escape(str(r.get("datacenter", "")))}</td>
               <td>{escape(str(r.get("alert", "")))}</td>
               <td>{escape(str(r.get("team", "")))}</td>
@@ -396,6 +407,7 @@ try:
                                 expr = rule.get("expr")
                                 team = rule.get("labels", {}).get("team", "no_name")
                                 alert_type = rule.get("labels", {}).get("type")
+                                state = rule.get("labels", {}).get("state", "N/A")
                                 severity = rule.get("labels", {}).get("severity")
 
                                 if team not in team_alerts:
@@ -409,6 +421,7 @@ try:
                                     "severity": severity,
                                     "type": alert_type,
                                     "team": team,
+                                    "state": state,
                                     "group": group_name,
                                     "file": file
                                 })
@@ -421,9 +434,9 @@ try:
     )
 
     team_pages = {
-        "caas": {
+        "cloudservices": {
             "space": "ManSer",
-            "title": "CaaS"
+            "title": "CloudServices"
         },
         "ceph": {
             "space": "ManSer",
@@ -441,7 +454,7 @@ try:
             "space": "ManSer",
             "title": "MLP"
         },
-        "iaas": {
+        "openstack": {
             "space": "ManSer",
             "title": "Openstack"
         },
@@ -469,7 +482,7 @@ try:
         rows = []
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
-        header = ["Datacenter", "Alert", "Team", "Severity", "Type", "Group", "File", "Expression"]
+        header = ["State", "Datacenter", "Alert", "Team", "Severity", "Type", "Group", "File", "Expression"]
         worksheet.append(header)
 
         for datacenter_name, alert_list  in datacenter.items():
@@ -480,6 +493,7 @@ try:
                     print(f"\t\t\t{key}: {value}")
 
                 rows.append({
+                    "state": alert_data["state"],
                     "datacenter": datacenter_name,
                     "alert": alert_data["alert"],
                     "team": alert_data["team"],
@@ -495,6 +509,7 @@ try:
 
         for r in rows:
             worksheet.append([
+                r["state"],
                 r["datacenter"],
                 r["alert"],
                 r["team"],
