@@ -282,7 +282,7 @@ def generate_html(team, rows):
               <td>{escape(str(r.get("alert", "")))}</td>
               <td>{escape(str(r.get("team", "")))}</td>
               <td>{escape(str(r.get("severity", "")))}</td>
-              <td>{escape(str(r.get("alert_type", "")))}</td>
+              <td>{escape(str(r.get("type", "")))}</td>
               <td>{escape(str(r.get("group", "")))}</td>
               <td>{escape(str(r.get("file", "")))}</td>
               <td>
