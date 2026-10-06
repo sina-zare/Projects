@@ -65,7 +65,7 @@ EVALTYPES = {"0": "And/Or", "1": "And", "2": "Or"}
 BULLET = "•"
 DIVIDER = "─" * 12
 
-# Media type colours: (fill, stroke, text). Matched by keyword in the media name.
+# Media type colors: (fill, stroke, text). Matched by keyword in the media name.
 MEDIA_COLORS = [
     ("mattermost",      ("#dbeafe", "#2563eb", "#1e3a8a")),
     ("sms",        ("#ffedd5", "#ea580c", "#7c2d12")),
@@ -79,7 +79,6 @@ FALLBACK_COLORS = [
     ("#fee2e2", "#dc2626", "#7f1d1d"),
 ]
 
-# Single quotes inside the style attribute: the label itself is double-quoted.
 LEFT_OPEN = "<div style='text-align:left'>"
 LEFT_CLOSE = "</div>"
 
@@ -113,8 +112,8 @@ def get_actions(zapi):
         output=["actionid", "name", "status", "eventsource"],
         filter={"eventsource": 0, "status": 0},  # enabled trigger actions
         selectFilter="extend",
-        selectOperations="extend",
-        sortfield="name",
+        selectOperations="extend", # includes the recipients and media
+        sortfield="name", # alphabetical order
     )
 
 
@@ -542,3 +541,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# python3 zabbix_actions_mermaid.py --by-recipient --per-row 5 --width 320 --merge --elk
