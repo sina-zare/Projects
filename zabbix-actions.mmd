@@ -1,0 +1,135 @@
+---
+config:
+  layout: elk
+  flowchart:
+    wrappingWidth: 320
+    nodeSpacing: 30
+    rankSpacing: 80
+---
+flowchart TD
+
+    action_45["<div style='text-align:left'><b>AtlasD Service Check</b><br/>────────────<br/>• <b>Event name</b> contains is not running<br/>• <b>Host</b> equals: VR3-ATLASD-DB · VR3-ATLASD-A1 · VR3-ATLASD-LB · VR3-ATLASD-A2<br/><i>Match: And/Or</i></div>"]:::action
+    recipient_1(["<div style='text-align:left'><b>mehdi.a (Mehdi Amini)</b><br/><i>6 actions</i></div>"]):::hub
+    action_45 -->|"Email"| recipient_1
+    action_45 -->|"SMS via Magfa"| recipient_1
+    recipient_2(["<div style='text-align:left'><b>mattermost-vip-customer-problems (Mattermost)</b><br/><i>2 actions</i></div>"]):::hub
+    action_45 -->|"Mattermost"| recipient_2
+
+    action_47["<div style='text-align:left'><b>DadeSaman</b><br/>────────────<br/>• <b>Host group</b> equals DadeSaman</div>"]:::action
+    endpoint_1(["<div style='text-align:left'><b>All media</b><br/>• dssnovinit@gmail.com</div>"]):::m_all_media
+    action_47 --> endpoint_1
+
+    action_33["<div style='text-align:left'><b>ME OnPrem URL Issues</b><br/>────────────<br/>• [A] <b>Host group</b> equals MER-Grp<br/>• [B] <b>Host group</b> equals MEA-Grp<br/>• [C] <b>Host group</b> equals MEI-Grp<br/>• [D] <b>Host group</b> equals MEM-Grp<br/>• [E] <b>Host group</b> does not equal VIP-Customers<br/><i>Formula: (A or B or C or D) and E</i></div>"]:::action
+    endpoint_2(["<div style='text-align:left'><b>Mattermost</b><br/>• mattermost-support-onprem-url-alerter (Mattermost)</div>"]):::m_mattermost
+    action_33 --> endpoint_2
+
+    action_31["<div style='text-align:left'><b>OnPrem and Rahkaran Abri Latency Issues</b><br/>────────────<br/>• <b>Event name</b> contains: Disk is overloaded · Disk read request responses are too high · Disk write request responses are too high<br/>• <b>Host group</b> equals: Rahkaran-Abri-Grp · VR1 Servers · VSP Servers · VR2 Servers · VR3 Servers · VBI Servers · VIA Servers · VMI Servers · VAT Servers · VSF Servers<br/><i>Match: And/Or</i></div>"]:::action
+    action_31 -->|"Email"| recipient_1
+
+    action_29["<div style='text-align:left'><b>OnPrem Compute Issues</b><br/>────────────<br/>• [A] <b>Event name</b> contains High CPU utilization<br/>• [B] <b>Event name</b> contains High memory utilization<br/>• [C] <b>Host group</b> equals VR1 Servers<br/>• [D] <b>Host group</b> equals VSP Servers<br/>• [E] <b>Host group</b> equals VR2 Servers<br/>• [F] <b>Host group</b> equals VR3 Servers<br/>• [G] <b>Host group</b> equals VRD Servers<br/>• [H] <b>Host group</b> equals VBI Servers<br/>• [I] <b>Host group</b> equals VIA Servers<br/>• [J] <b>Host group</b> equals VMI Servers<br/>• [K] <b>Host group</b> equals VAT Servers<br/>• [L] <b>Host group</b> equals VSF Servers<br/>• [M] <b>Host group</b> does not equal VIP-Customers<br/><i>Formula: ((A or B) and (C or D or E or F or G or H or I or J or K or L)) and M</i></div>"]:::action
+    recipient_3(["<div style='text-align:left'><b>mattermost-support-onprem-alerter (Mattermost)</b><br/><i>2 actions</i></div>"]):::hub
+    action_29 -->|"Mattermost"| recipient_3
+
+    action_30["<div style='text-align:left'><b>OnPrem Disk Issues</b><br/>────────────<br/>• [A] <b>Event name</b> contains Space is critically low<br/>• [B] <b>Event name</b> contains Space is low<br/>• [C] <b>Host group</b> equals VR1 Servers<br/>• [D] <b>Host group</b> equals VSP Servers<br/>• [E] <b>Host group</b> equals VR2 Servers<br/>• [F] <b>Host group</b> equals VR3 Servers<br/>• [G] <b>Host group</b> equals VRD Servers<br/>• [H] <b>Host group</b> equals VBI Servers<br/>• [I] <b>Host group</b> equals VIA Servers<br/>• [J] <b>Host group</b> equals VMI Servers<br/>• [K] <b>Host group</b> equals VAT Servers<br/>• [L] <b>Host group</b> equals VSF Servers<br/>• [M] <b>Host group</b> does not equal VIP-Customers<br/><i>Formula: ((A or B) and (C or D or E or F or G or H or I or J or K or L)) and M</i></div>"]:::action
+    action_30 -->|"Mattermost"| recipient_3
+
+    action_44["<div style='text-align:left'><b>Rahakran DR Servers</b><br/>────────────<br/>• <b>Host group</b> equals Rahkaran_DR</div>"]:::action
+    endpoint_3(["<div style='text-align:left'><b>Mattermost</b><br/>• mattermost-system-rahkaran-dr-servers (Mattermost)</div>"]):::m_mattermost
+    action_44 --> endpoint_3
+    recipient_4(["<div style='text-align:left'><b>system (System Service Account)</b><br/><i>2 actions</i></div>"]):::hub
+    action_44 -->|"Email"| recipient_4
+
+    action_14["<div style='text-align:left'><b>Rahkaran Abri CPU</b><br/>────────────<br/>• <b>Event name</b> contains High CPU utilization<br/>• <b>Host group</b> equals Rahkaran-Abri-Grp<br/><i>Match: And/Or</i></div>"]:::action
+    recipient_5(["<div style='text-align:left'><b>rahkaranabrisupport (CFRS Service Account)</b><br/><i>4 actions</i></div>"]):::hub
+    action_14 -->|"Email"| recipient_5
+
+    action_11["<div style='text-align:left'><b>Rahkaran Abri Drive C</b><br/>────────────<br/>• <b>Event name</b> contains: C:)]: Space is critically low · C:)]: Space is low · FS [(C:)]: Space is critically low · FS [(C:)]: Space is low<br/>• <b>Host group</b> equals Rahkaran-Abri-Grp<br/><i>Match: And/Or</i></div>"]:::action
+    recipient_6(["<div style='text-align:left'><b>mattermost-support-abri-alerter (Mattermost)</b><br/><i>3 actions</i></div>"]):::hub
+    action_11 -->|"Mattermost"| recipient_6
+
+    action_12["<div style='text-align:left'><b>Rahkaran Abri Drive D</b><br/>────────────<br/>• <b>Event name</b> contains: D:)]: Space is critically low · D:)]: Space is low · F:)]: Space is critically low · F:)]: Space is low · FS [New Volume(D:)]: Space is critically low · FS [New Volume(D:)]: Space is low · FS [New Volume(F:)]: Space is critically low · FS [New Volume(F:)]: Space is low<br/>• <b>Host group</b> equals Rahkaran-Abri-Grp<br/><i>Match: And/Or</i></div>"]:::action
+    action_12 -->|"Email"| recipient_5
+
+    action_13["<div style='text-align:left'><b>Rahkaran Abri RAM</b><br/>────────────<br/>• <b>Event name</b> contains High memory utilization<br/>• <b>Host group</b> equals Rahkaran-Abri-Grp<br/><i>Match: And/Or</i></div>"]:::action
+    action_13 -->|"Mattermost"| recipient_6
+    action_13 -->|"Email"| recipient_5
+
+    action_43["<div style='text-align:left'><b>Rahkaran Abri Service</b><br/>────────────<br/>• <b>Event name</b> contains is not running</div>"]:::action
+    action_43 -->|"Email"| recipient_5
+
+    action_40["<div style='text-align:left'><b>Rahkaran_Retail_Issues</b><br/>────────────<br/>• <b>Event name</b> contains: High CPU utilization · High memory utilization · is not running · Space is critically low · Space is low<br/>• <b>Host</b> equals: VR2-DATIS-DB · VR2-DATIS-A1<br/><i>Match: And/Or</i></div>"]:::action
+    action_40 -->|"Email"| recipient_1
+    endpoint_4(["<div style='text-align:left'><b>Email</b><br/>• retail (Abramad Retail)<br/>• saeed.r (Saeed Rahman)</div>"]):::m_email
+    action_40 --> endpoint_4
+
+    action_39["<div style='text-align:left'><b>Ramak Issues</b><br/>────────────<br/>• <b>Event name</b> contains: High CPU utilization · High memory utilization<br/>• <b>Host group</b> equals CG-Ramak<br/><i>Match: And/Or</i></div>"]:::action
+    action_39 -->|"Email"| recipient_1
+    endpoint_5(["<div style='text-align:left'><b>Email</b><br/>• ramak-abbas.a (Abbas Asghari)<br/>• ramak-mozhgan.f (Mozhgan Farahani)<br/>• ramak-reza.mo (Reza Mousavi)<br/>• ramak-saeid.p (Saeid Parsimehr)<br/>• ramak-sajjad.r (Sajjad Rahimi)<br/>• ramak-sepehr.a (Sepehr Amiri)</div>"]):::m_email
+    action_39 --> endpoint_5
+
+    action_28["<div style='text-align:left'><b>SysOps_Team</b><br/>────────────<br/>• <b>Event name</b> does not contain Utilization of housekeeper<br/>• <b>Host group</b> equals SYSOPS_Team<br/><i>Match: And/Or</i></div>"]:::action
+    endpoint_6(["<div style='text-align:left'><b>Mattermost</b><br/>• mattermost-sysops-alerter (Mattermost)</div>"]):::m_mattermost
+    action_28 --> endpoint_6
+    recipient_7(["<div style='text-align:left'><b>Group: SYSOPS_Team</b><br/><i>2 actions</i></div>"]):::hub
+    action_28 -->|"Email"| recipient_7
+
+    action_38["<div style='text-align:left'><b>SysOps_Team_SMS</b><br/>────────────<br/>• <b>Event name</b> does not contain Utilization of housekeeper<br/>• <b>Trigger severity</b> is greater than or equals Average<br/>• <b>Host group</b> equals SYSOPS_Team<br/><i>Match: And/Or</i></div>"]:::action
+    action_38 -->|"SMS via Magfa"| recipient_7
+
+    action_36["<div style='text-align:left'><b>System_Team</b><br/>────────────<br/>• <b>Host</b> equals VR2-NORD-LOCK</div>"]:::action
+    action_36 -->|"Email"| recipient_4
+
+    action_46["<div style='text-align:left'><b>URL Aggregation Check</b><br/>────────────<br/>• <b>Host</b> equals URL Check Aggregations</div>"]:::action
+    action_46 -->|"Email"| recipient_1
+    endpoint_7(["<div style='text-align:left'><b>Email</b><br/>• Group: Support_Team<br/>• alireza.ja (Alireza Javaherzadeh)</div>"]):::m_email
+    action_46 --> endpoint_7
+    action_46 -->|"SMS via Magfa"| recipient_1
+    endpoint_8(["<div style='text-align:left'><b>SMS via Magfa</b><br/>• alireza.ja (Alireza Javaherzadeh)</div>"]):::m_sms
+    action_46 --> endpoint_8
+
+    action_42["<div style='text-align:left'><b>VIP_Customer_Problems</b><br/>────────────<br/>• <b>Host group</b> equals VIP-Customers</div>"]:::action
+    action_42 -->|"Mattermost"| recipient_2
+
+    action_41["<div style='text-align:left'><b>VIP_URL_SMS</b><br/>────────────<br/>• <b>Host</b> equals mer-mahya</div>"]:::action
+    action_41 -->|"SMS via Magfa"| recipient_1
+
+    action_15["<div style='text-align:left'><b>VNK OnPrem+Abri Customer Zabbix Agent Issues</b><br/>────────────<br/>• <b>Event name</b> contains: Active checks are not available · Zabbix agent is not available<br/>• <b>Host group</b> equals Windows Servers<br/><i>Match: And/Or</i></div>"]:::action
+    action_15 -->|"Mattermost"| recipient_6
+
+    action_45 ~~~ action_30
+    action_47 ~~~ action_44
+    action_33 ~~~ action_14
+    action_31 ~~~ action_11
+    action_29 ~~~ action_12
+    action_30 ~~~ action_13
+    action_44 ~~~ action_43
+    action_14 ~~~ action_40
+    action_11 ~~~ action_39
+    action_12 ~~~ action_28
+    action_13 ~~~ action_38
+    action_43 ~~~ action_36
+    action_40 ~~~ action_46
+    action_39 ~~~ action_42
+    action_28 ~~~ action_41
+    action_38 ~~~ action_15
+    recipient_1 ~~~ endpoint_3
+    recipient_2 ~~~ recipient_4
+    endpoint_1 ~~~ recipient_5
+    endpoint_2 ~~~ recipient_6
+    recipient_3 ~~~ endpoint_4
+    endpoint_3 ~~~ endpoint_5
+    recipient_4 ~~~ endpoint_6
+    recipient_5 ~~~ recipient_7
+    recipient_6 ~~~ endpoint_7
+    endpoint_4 ~~~ endpoint_8
+
+    classDef action fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+    classDef hub fill:#f1f5f9,stroke:#475569,stroke-width:2.5px,color:#0f172a
+    classDef m_email fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef m_sms fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef m_mattermost fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef m_all_media fill:#e5e7eb,stroke:#6b7280,stroke-width:2px,color:#111827
+    linkStyle 0,5,9,10,12,14,15,16,17,18,19,21,23,24,25 stroke:#16a34a,stroke-width:2px
+    linkStyle 1,22,26,27,29 stroke:#ea580c,stroke-width:2px
+    linkStyle 2,4,6,7,8,11,13,20,28,30 stroke:#2563eb,stroke-width:2px
+    linkStyle 3 stroke:#6b7280,stroke-width:2px

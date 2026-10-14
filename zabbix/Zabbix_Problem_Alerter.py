@@ -191,6 +191,45 @@ try:
             error_string_detail += f" Error 'email_sender' occurred in file {last_call.filename}, line {last_call.lineno}: {last_call.line}"
 
 
+    def build_trigger_cache(zapi, trigger_ids, cache):
+        """Fetch value/status/dependencies for triggers not in cache yet,
+        and keep following dependencies until no unknown triggers remain."""
+        pending = {t for t in trigger_ids if t not in cache}
+        while pending:
+            result = zapi.trigger.get(
+                triggerids=list(pending),
+                output=["triggerid", "value", "status"],
+                selectDependencies=["triggerid"],
+            )
+            for t in result:
+                cache[t["triggerid"]] = {
+                    "value": t["value"],  # "1" = PROBLEM
+                    "status": t["status"],  # "0" = enabled
+                    "deps": [d["triggerid"] for d in t.get("dependencies", [])],
+                }
+            # triggers that weren't returned (deleted etc.) shouldn't loop forever
+            for t in pending:
+                cache.setdefault(t, {"value": "0", "status": "1", "deps": []})
+            pending = {
+                d for info in cache.values() for d in info["deps"] if d not in cache
+            }
+
+
+    def has_firing_master(trigger_id, cache, visited=None):
+        """True if any (transitive) master trigger is enabled and in PROBLEM state."""
+        visited = visited or set()
+        if trigger_id in visited:  # protect against circular dependencies
+            return False
+        visited.add(trigger_id)
+        for master_id in cache[trigger_id]["deps"]:
+            master = cache[master_id]
+            if master["status"] == "0" and master["value"] == "1":
+                return True
+            if has_firing_master(master_id, cache, visited):
+                return True
+        return False
+
+
     today_date = str(datetime.now().strftime('%Y-%m-%d')).replace('-', '_')
     ten_days_in_seconds = 10 * 24 * 60 * 60  # 864,000 seconds
     severity_dict = {
@@ -243,13 +282,14 @@ try:
     # Zabbix credentials
     username = 'sysops-svc'
     passphrase = decryptor('sysops-svc_enc', 'sysops-svc_key')
+    skip_dependencies = True
 
     for zabbix_server_name, zabbix_server_address in zabbix_servers.items():
         # Connect to Zabbix API
         zapi = ZabbixAPI(zabbix_server_address)
         zapi.login(username, passphrase)
         print(f"Connected to Zabbix API Version {zapi.api_version()}")
-
+        trigger_cache = {}
 
 
         # Get all host groups
@@ -289,6 +329,12 @@ try:
                     sortorder="DESC"
                 )
 
+                # Drop problems that are covered by a firing master trigger
+                if skip_dependencies:
+                    build_trigger_cache(zapi, {p["objectid"] for p in problems}, trigger_cache)
+                    suppressed = [p for p in problems if has_firing_master(p["objectid"], trigger_cache)]
+                    problems = [p for p in problems if not has_firing_master(p["objectid"], trigger_cache)]
+                    print(f"  Dropped {len(suppressed)} problems with a firing master trigger")
 
                 print(zabbix_server_name)
                 if problems:
