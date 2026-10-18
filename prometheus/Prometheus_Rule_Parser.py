@@ -476,7 +476,7 @@ try:
         },
         "development": {
             "space": "ManSer",
-            "title": "development"
+            "title": "Development"
         },
     }
 
