@@ -15,7 +15,6 @@ import time
 import csv
 import os
 
-
 # --- Configuration ---
 script_name = 'alertmanager_problem_alerter'
 total_exec_counter_file = f'C://Temp//Script_Metrics//{script_name}-total-execs.txt'
@@ -32,15 +31,19 @@ registry = CollectorRegistry()
 # Define metrics
 duration_gauge = Gauge('script_exec_duration_seconds', 'Duration of my script', registry=registry)
 status_gauge = Gauge('script_success', 'Whether script succeeded (1) or failed (0)', registry=registry)
-total_execution_counter = Counter('script_total_execs', 'Total number of times the script has run',registry=registry)
-total_failed_execution_counter = Counter('script_total_failed_execs', 'Total number of times the script has failed to finish gracefully',registry=registry)
-last_error_message = Gauge('script_last_error_message', 'The last error message encountered during script execution', ['error_summary', 'error_detail'], registry=registry)
+total_execution_counter = Counter('script_total_execs', 'Total number of times the script has run', registry=registry)
+total_failed_execution_counter = Counter('script_total_failed_execs',
+                                         'Total number of times the script has failed to finish gracefully',
+                                         registry=registry)
+last_error_message = Gauge('script_last_error_message', 'The last error message encountered during script execution',
+                           ['error_summary', 'error_detail'], registry=registry)
 
 # Simulate your script logic
 start_time = time.time()
 success = True
 error_string_summary = ""
 error_string_detail = ""
+
 
 # Zipper function
 def make_zip(files, zip_name, password):
@@ -205,9 +208,10 @@ def get_alerts(alertmanager_url, overdue=0):
                 if starts_at_str:
                     starts_at = datetime.fromisoformat(starts_at_str.replace("Z", "+00:00"))
                     starts_at_localized = \
-                    starts_at.replace(tzinfo=timezone.utc).astimezone(target_timezone).isoformat(timespec='seconds',
-                                                                                                 sep=' ').split('+')[
-                        0]  # Important!
+                        starts_at.replace(tzinfo=timezone.utc).astimezone(target_timezone).isoformat(timespec='seconds',
+                                                                                                     sep=' ').split(
+                            '+')[
+                            0]  # Important!
 
                     now = datetime.now(timezone.utc)
                     # now_localized = now.astimezone(target_timezone)
@@ -241,15 +245,17 @@ def get_alerts(alertmanager_url, overdue=0):
                         team_name = alert.get('labels', {}).get('team', 'no_name')
                         environment = alert.get('labels', {}).get('type', 'N/A')
                         severity = alert.get('labels', {}).get('severity', 'N/A')
+                        state = alert.get('labels', {}).get('state', 'N/A')
 
                         # create empty team name element, if existed append it
                         alert_dict.setdefault(team_name, []).append({
                             'instance': instance,
-                            'alert': alert_name,#alert_sum,#alert_name,
+                            'alert': alert_name,  # alert_sum,#alert_name,
                             'severity': severity,
                             'time': starts_at_localized,
                             'age': age_str,
-                            'env': environment
+                            'env': environment,
+                            'state': state,
                         })
 
                         # print(f"- Alert: {alert_name}")
@@ -302,7 +308,6 @@ def get_alerts(alertmanager_url, overdue=0):
         print(f"Script failed: {error_string_summary}\n{error_string_detail}")
 
 
-
 # Main App
 try:
     today_date = str(datetime.now().strftime('%Y-%m-%d')).replace('-', '_')
@@ -318,7 +323,7 @@ try:
     alertmanager_urls = {
         'VNK-Alertmanager': 'http://172.29.6.16:9093/api/v2/alerts',
         'ME-Alertmanager': 'http://172.17.234.37:9093/api/v2/alerts',
-                         }
+    }
 
     email_dict = {
         'sysops': 'sysops@abramad.com',
@@ -329,17 +334,16 @@ try:
         'csb': 'csb@abramad.com',
         'csb_storage_sds': 'sds@abramad.com',
         'security': 'Security@abramad.com',
-        'iaas': 'openstack@abramad.com',
+        'openstack': 'openstack@abramad.com',
         'mlp': 'mlplatform@abramad.com',
-        'paas': 'kubernetes@abramad.com',
+        'kubernetes': 'kubernetes@abramad.com',
         'ceph': 'sds@abramad.com',
         'noc': 'noc@abramad.com',
-        'caas': 'caas@abramad.com',
+        'cloudservices': 'cloudservices@abramad.com',
         'datacenter': 'datacenter@abramad.com',
         'no_name': 'sysops@abramad.com',
         # 'Platform_Team': 'ProductMGMT@abramad.com',
         # 'SGIS_Team': 'foroughe@systemgroup.net,ramins@systemgroup.net',
-        # 'Cloud_Services_Team': 'ProductDevelopment@abramad.com',
         # 'EPM_Team': 'epm@abramad.com',
         # 'ITSM_Team': 'itsm@abramad.com',
     }
@@ -370,23 +374,24 @@ try:
                 writer.writerow(["Instance", "Problem", "Severity", "Time", "Age"])
 
                 for alert in alert_list:
+                    # Bring enabled alerts only
+                    if alert.get('state', 'N/A').lower() == 'enabled':
+                        # Write to CSV
+                        writer.writerow([alert.get('instance', 'N/A'),
+                                         f'{alert.get('alert', 'N/A')} | Env: {alert.get('env', 'N/A')}',
+                                         alert.get('severity', 'N/A'),
+                                         alert.get('time', 'N/A'),
+                                         alert.get('age', 'N/A')])
 
-                    # Write to CSV
-                    writer.writerow([alert.get('instance', 'N/A'),
-                                     f'{alert.get('alert', 'N/A')} | Env: {alert.get('env', 'N/A')}',
-                                     alert.get('severity', 'N/A'),
-                                     alert.get('time', 'N/A'),
-                                     alert.get('age', 'N/A')])
-
-                    html_tbl += f"""
-                            <tr class="severity-{alert.get('severity', 'N/A')}">
-                                <td>{alert.get('instance', 'N/A')}</td>
-                                <td>Name: {alert.get('alert', 'N/A')} | Env: {alert.get('env', 'N/A')}</td>
-                                <td>{alert.get('severity', 'N/A')}</td>
-                                <td>{alert.get('time', 'N/A')}</td>
-                                <td>{alert.get('age', 'N/A')}</td>
-                            </tr>
-                        """
+                        html_tbl += f"""
+                                <tr class="severity-{alert.get('severity', 'N/A')}">
+                                    <td>{alert.get('instance', 'N/A')}</td>
+                                    <td>Name: {alert.get('alert', 'N/A')} | Env: {alert.get('env', 'N/A')}</td>
+                                    <td>{alert.get('severity', 'N/A')}</td>
+                                    <td>{alert.get('time', 'N/A')}</td>
+                                    <td>{alert.get('age', 'N/A')}</td>
+                                </tr>
+                            """
 
             html_tbl += """
                         </table>
@@ -405,11 +410,10 @@ try:
             files = [csv_file_path]
             make_zip(files, zip_file_path, zip_pass)
 
-
             send_anonymous_email(
                 from_email=from_email,
-                to_email='sina.z@abramad.com',#email_dict[team],
-                cc_email='sina.z@abramad.com',#default_cc,
+                to_email=email_dict[team],
+                cc_email=default_cc,
                 subject=f"Alertmanager Alerts Over {days_over} days | {team} | {alertmanager_name}",
                 html_message=html,
                 direction="ltr",

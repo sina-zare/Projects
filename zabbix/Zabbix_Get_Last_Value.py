@@ -40,11 +40,11 @@ updated = 0
 not_updated = 0
 for item in items:
     host = item["hosts"][0]
-    if item['lastvalue'] == 'Windows Server 2019 Standard 17763.1.amd64fre.rs5_release.180914-1434 Build 17763.7678':
-        updated += 1
-        print(f"{host['name']}: {item.get('lastvalue', 'Not found')}")
-    else:
-        not_updated += 1
+    # if item['lastvalue'] == 'Windows Server 2019 Standard 17763.1.amd64fre.rs5_release.180914-1434 Build 17763.7678':
+    #     updated += 1
+    print(f"{host['name']}: {item.get('lastvalue', 'Not found')}")
+    # else:
+    #     not_updated += 1
         #print(f"{host['name']}: {item.get('lastvalue', 'Not found')}")
 
 #print(f'\n\nZabbix Agent 2 Update Status\nSuccess: {updated}\nFail: {not_updated}')

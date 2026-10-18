@@ -252,7 +252,7 @@ try:
         'Support_Team': 'support@abramad.com',
         'CSB_Team': 'csb@abramad.com',
         'Security_Team': 'Security@abramad.com',
-        'IaaS_Team': 'openstack@abramad.com',
+        'OpenStack_Team': 'openstack@abramad.com',
         'Datacenter_Team': 'datacenter@abramad.com',
         'MLP_Team': 'mlplatform@abramad.com',
         'PaaS_Team': 'kubernetes@abramad.com',

@@ -59,14 +59,16 @@ def get_data_by_hostgroup(zabbix_url, zabbix_user, zabbix_password, hostgroup_na
 
 
 # Zabbix server credentials
-zabbix_url = "http://172.29.6.11"
-hostgroup_name = "VRA Servers"
+zabbix_url = "https://vnk-zabbix.abramad.com/"
+hostgroup_name = "CSB_Storage_SAN"
 
 try:
     nodes = get_data_by_hostgroup(zabbix_url, username, password, hostgroup_name)
     print(f"Nodes in host group '{hostgroup_name}':")
     for node in nodes:
-        print(f"{node['name'].strip('.abramad.com')},{node['ip']}")
+        print(node)
+
+        #print(f"{node['name'].strip('.abramad.com')},{node['ip']}")
 except Exception as e:
     print(f"Error: {e}")
 
