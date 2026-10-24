@@ -43,7 +43,7 @@ with open("C:\\Temp\\zabbix_users.csv", "r", encoding="utf-8") as file:
 zabbix_urls = {
         'VNK-Zabbix': "https://vnk-zabbix.abramad.com",
         'VNK-CustomerZabbix': 'http://172.29.6.15',
-        'ME-Zabbix': 'http://172.17.234.13/zabbix/',
+        'ME-Zabbix': 'https://me-zabbix.abramad.com/zabbix/',
         'ME-CustomerZabbix': 'http://172.17.234.23'
     }
 # Zabbix connection details

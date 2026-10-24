@@ -2,11 +2,11 @@ try:
     from prometheus_client import CollectorRegistry, Gauge, push_to_gateway, Counter
     from email.mime.multipart import MIMEMultipart
     from cryptography.fernet import Fernet
-    from pyvim.connect import Disconnect
+    from pyVim.connect import Disconnect
     from email.mime.text import MIMEText
     from email.header import Header
     from pyzabbix import ZabbixAPI
-    from pyvim import connect
+    from pyVim import connect
     from pyVmomi import vim
     import traceback
     import jdatetime
@@ -202,7 +202,7 @@ try:
         # 303: "vm_url",
         # 304: "vm_ipsids_status",
         # 305: "vm_in_dept_status",
-        # 307: "vm_not_monitored_status",
+        1009: "vm_not_monitored_status",
         # 308: "vm_owner",
         # 309: "vm_dongle_status",
         # 312: "vm_site_to_site_status",
@@ -319,16 +319,20 @@ try:
                 # get vm custom attributes
                 vm_attrs = {}
                 for attr in vm.summary.customValue:
+                    # if vm_name.lower() == 'vra-amery001':
+                    #     print(f"{attr.key}: {attr.value}")
                     if attr.key in vra_key_map:
                         vm_attrs[vra_key_map[attr.key]] = attr.value
 
                 # set vm custom attributes
                 vra_shutdown_ticket_id = vm_attrs.get('vm_shutdown_ticket_no', 'Null')
+                vm_not_monitored = True if (vm_attrs.get('vm_not_monitored_status', False) == '1') else False
+                #print(f"{vm_name} - {vm_not_monitored}")
 
                 #  Distinguishing VMs
                 vcenter_vra_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
-                if vm_power.endswith('off') and vra_shutdown_ticket_id != 'Null':  # if vm is shutdown and shutdown ticket is set
+                if (vm_power.endswith('off') and vra_shutdown_ticket_id != 'Null') or vm_not_monitored:  # if vm is shutdown and shutdown ticket is set or not monitored is 1
                     vcenter_poff_vms[vm_name] = [vm_name, vm_url, vm_note, vm_fqdn, vm_power]
 
                 # elif vm_nic_status == 'disconnected':  # and vra_disconnect_ticket_id != 'Null':  # if vm is disconnected adn disconnect ticket is set
